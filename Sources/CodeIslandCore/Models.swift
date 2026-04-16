@@ -42,6 +42,23 @@ public enum CLIProcessResolver {
 
         return immediateParentPID
     }
+
+    /// Walk the process ancestry and return the first known CLI source whose binary
+    /// appears along the chain. Used when a hook event reaches the bridge without a
+    /// `--source` tag (e.g. omo plugin firing Claude hooks from inside OpenCode), so
+    /// we can recover the real source instead of letting the event default to Claude.
+    public static func inferSource(ancestry: [(pid: Int32, executablePath: String?)]) -> String? {
+        let candidates = SessionSnapshot.supportedSources.sorted()
+        for entry in ancestry {
+            guard let path = entry.executablePath, !path.isEmpty else { continue }
+            for source in candidates {
+                if sourceMatchesExecutablePath(path, source: source) {
+                    return source
+                }
+            }
+        }
+        return nil
+    }
 }
 
 public enum AgentStatus {
