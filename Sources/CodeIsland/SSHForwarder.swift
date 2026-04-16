@@ -49,6 +49,12 @@ final class SSHForwarder {
             DispatchQueue.main.async {
                 guard let self else { return }
                 guard self.generation == currentGeneration else { return }
+                // Release the stderr pipe/handler the moment the child exits. If we leave the
+                // readabilityHandler registered, the closed FD keeps getting poked and the
+                // handler is invoked in a tight loop, pinning CPU at 100% when ssh disconnects.
+                self.stderrPipe?.fileHandleForReading.readabilityHandler = nil
+                self.stderrPipe = nil
+                self.process = nil
                 if case .disconnected = self.status { return }
                 let code = proc.terminationStatus
                 self.status = .failed("ssh exited (\(code))")
