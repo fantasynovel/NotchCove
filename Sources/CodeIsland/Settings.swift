@@ -83,6 +83,12 @@ enum SettingsKey {
 
     // Compact-bar layout style: "extended" (default, with side wings) or "compact" (Claude Island style, stays inside notch)
     static let notchLayoutMode = "notchLayoutMode"
+
+    // Clawd (Claude) mascot — dumbbell-curl work animation tuning (Mascot Lab)
+    static let clawdCurlCycleMs = "clawdCurlCycleMs"
+    static let clawdCurlArmRaise = "clawdCurlArmRaise"
+    static let clawdCurlSway = "clawdCurlSway"
+    static let clawdDumbbellSize = "clawdDumbbellSize"
 }
 
 struct SettingsDefaults {
@@ -127,6 +133,11 @@ struct SettingsDefaults {
 
     static let collapsedWidthScale = 100  // percentage; 100% == real notch width
     static let notchLayoutMode = NotchLayoutMode.extended.rawValue
+
+    static let clawdCurlCycleMs = 1200     // 500..2500
+    static let clawdCurlArmRaise = 7.5     // 3.0..8.0 (svg units)
+    static let clawdCurlSway = 0.18        // 0..0.5
+    static let clawdDumbbellSize = 1.15   // multiplier: 0.5..2.0
 }
 
 enum NotchLayoutMode: String, CaseIterable {
@@ -175,6 +186,10 @@ class SettingsManager {
             SettingsKey.showToolStatus: SettingsDefaults.showToolStatus,
             SettingsKey.collapsedWidthScale: SettingsDefaults.collapsedWidthScale,
             SettingsKey.notchLayoutMode: SettingsDefaults.notchLayoutMode,
+            SettingsKey.clawdCurlCycleMs: SettingsDefaults.clawdCurlCycleMs,
+            SettingsKey.clawdCurlArmRaise: SettingsDefaults.clawdCurlArmRaise,
+            SettingsKey.clawdCurlSway: SettingsDefaults.clawdCurlSway,
+            SettingsKey.clawdDumbbellSize: SettingsDefaults.clawdDumbbellSize,
         ])
     }
 

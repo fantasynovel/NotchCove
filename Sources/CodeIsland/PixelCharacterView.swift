@@ -8,9 +8,15 @@ struct ClawdView: View {
     var size: CGFloat = 27
     @State private var alive = false
     @Environment(\.mascotSpeed) private var speed
+    @AppStorage(SettingsKey.clawdCurlCycleMs) private var curlCycleMs = SettingsDefaults.clawdCurlCycleMs
+    @AppStorage(SettingsKey.clawdCurlArmRaise) private var curlArmRaise = SettingsDefaults.clawdCurlArmRaise
+    @AppStorage(SettingsKey.clawdCurlSway) private var curlSway = SettingsDefaults.clawdCurlSway
+    @AppStorage(SettingsKey.clawdDumbbellSize) private var dumbbellSize = SettingsDefaults.clawdDumbbellSize
+    private static let dumbbellC = Color(hex: "#40D5A6")
 
     // Colors from clawd-on-desk
-    private static let bodyC  = Color(red: 0.871, green: 0.533, blue: 0.427) // #DE886D
+    private static let bodyC  = Color(red: 0.871, green: 0.533, blue: 0.427) // #DE886D — face / body
+    private static let armC   = Color(red: 0.788, green: 0.459, blue: 0.353) // #C9755A — slightly darker for arms
     private static let eyeC   = Color.black
     private static let alertC = Color(red: 1.0, green: 0.24, blue: 0.0)     // #FF3D00
     private static let kbBase = Color(red: 0.38, green: 0.44, blue: 0.50)  // lighter base
@@ -39,9 +45,9 @@ struct ClawdView: View {
         let ox: CGFloat, oy: CGFloat, s: CGFloat
         let y0: CGFloat
 
-        init(_ sz: CGSize, svgW: CGFloat = 15, svgH: CGFloat = 10, svgY0: CGFloat = 6) {
+        init(_ sz: CGSize, svgW: CGFloat = 15, svgH: CGFloat = 10, svgX0: CGFloat = 0, svgY0: CGFloat = 6) {
             s = min(sz.width / svgW, sz.height / svgH)
-            ox = (sz.width - svgW * s) / 2
+            ox = (sz.width - svgW * s) / 2 + svgX0 * s
             oy = (sz.height - svgH * s) / 2
             y0 = svgY0
         }
@@ -158,7 +164,7 @@ struct ClawdView: View {
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // WORK — typing: bounce + arm rotation + keyboard + squinted eyes
+    // WORK — alternating dumbbell curls
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     private var workScene: some View {
         TimelineView(.periodic(from: .now, by: 0.03)) { timeline in
@@ -168,88 +174,79 @@ struct ClawdView: View {
     }
 
     private func workCanvas(t: Double) -> some View {
-        // Body bounce: 0.35s (matches SVG)
-        let bounce = sin(t * 2 * .pi / 0.35) * 1.2
-        let breathe = sin(t * 2 * .pi / 3.2)
+        // Alternating curls — duration is Mascot Lab tunable
+        let cycle: Double = Double(curlCycleMs) / 1000.0
+        let leftRaw = sin(t * 2 * .pi / cycle)             // -1..1
+        let rightRaw = sin(t * 2 * .pi / cycle + .pi)      // 180° out of phase
+        let leftRaise: CGFloat = (leftRaw + 1) / 2          // 0..1
+        let rightRaise: CGFloat = (rightRaw + 1) / 2
 
-        // Arm typing: fast, correct direction (inward toward keyboard)
-        // Left: -10° to -55° (0.15s cycle), Right: 10° to 55° (0.12s cycle)
-        let armLRaw = sin(t * 2 * .pi / 0.15)  // -1..1
-        let armL = armLRaw * 22.5 - 32.5        // -55 to -10
-        let armRRaw = sin(t * 2 * .pi / 0.12)
-        let armR = armRRaw * 22.5 + 32.5        // 10 to 55
+        // Body leans slightly toward the raised side (counter-weight look)
+        let sway = CGFloat(leftRaw - rightRaw) * CGFloat(curlSway)
+        let breathe = (leftRaise + rightRaise - 1) * 0.5    // puffs when either arm up
 
-        // Key flash synced: flash left keys when left arm is down (armLRaw > 0.5)
-        let leftHit = armLRaw > 0.3
-        let rightHit = armRRaw > 0.3
-        // Randomize which key flashes using time
-        let leftKeyCol = Int(t / 0.15) % 3     // 0..2 (left side keys)
-        let rightKeyCol = 3 + Int(t / 0.12) % 3 // 3..5 (right side keys)
-
-        // Eyes: squinted, occasional scan up
-        let scanPhase = t.truncatingRemainder(dividingBy: 10.0)
-        let eyeScale: CGFloat = (scanPhase > 5.7 && scanPhase < 6.9) ? 1.0 : 0.5
-        let eyeDY: CGFloat = eyeScale < 0.8 ? 1.0 : -0.5
-        let blinkPhase = t.truncatingRemainder(dividingBy: 3.5)
-        let finalEyeScale = (blinkPhase > 1.4 && blinkPhase < 1.55) ? 0.1 : eyeScale
+        // Eye blink
+        let blinkPhase = t.truncatingRemainder(dividingBy: 3.2)
+        let eyeH: CGFloat = (blinkPhase > 1.4 && blinkPhase < 1.55) ? 0.2 : 1.6
 
         return Canvas { c, sz in
-            let v = V(sz, svgW: 16, svgH: 11, svgY0: 5.5)
-            let dy = bounce
+            // Wider virtual canvas + X shift so outstretched dumbbells stay inside the frame
+            let v = V(sz, svgW: 18, svgH: 11, svgX0: 1, svgY0: 4.8)
 
-            // 1. Shadow
-            let shadowW: CGFloat = 9 - abs(dy) * 0.3
-            c.fill(Path(v.r(3 + (9 - shadowW) / 2, 15, shadowW, 1)),
-                   with: .color(.black.opacity(max(0.1, 0.4 - abs(dy) * 0.03))))
+            // Shadow
+            c.fill(Path(v.r(3, 15, 9, 1)), with: .color(.black.opacity(0.32)))
 
-            // 2. Short legs (h=2, behind keyboard)
+            // Legs
             for x: CGFloat in [3, 5, 9, 11] {
                 c.fill(Path(v.r(x, 13, 1, 2)), with: .color(Self.bodyC))
             }
 
-            // 3. Torso
-            let bScale = 1.0 + breathe * 0.015
+            // Arms + dumbbells first — the body is drawn on top so arms & weights
+            // appear to pass behind the torso / face
+            drawCurl(c, v: v, shoulderX: 1.5 + sway, raise: leftRaise)
+            drawCurl(c, v: v, shoulderX: 13.5 + sway, raise: rightRaise)
+
+            // Torso (full body, covers anything behind it)
+            let bScale = 1.0 + breathe * 0.03
             let torsoW = 11 * bScale
-            c.fill(Path(v.r(2 - (torsoW - 11) / 2, 6, torsoW, 7, dy: dy)),
-                   with: .color(Self.bodyC))
+            let torsoX = 2 - (torsoW - 11) / 2 + sway
+            c.fill(Path(v.r(torsoX, 6, torsoW, 7)), with: .color(Self.bodyC))
 
-            // 4. Eyes
-            let eyeH: CGFloat = 2 * finalEyeScale
-            let eyeY: CGFloat = 8 + (2 - eyeH) / 2 + eyeDY
-            c.fill(Path(v.r(4, eyeY, 1, eyeH, dy: dy)), with: .color(Self.eyeC))
-            c.fill(Path(v.r(10, eyeY, 1, eyeH, dy: dy)), with: .color(Self.eyeC))
-
-            // 5. Keyboard (on top of legs)
-            c.fill(Path(v.r(-0.5, 11.8, 16, 3.5)), with: .color(Self.kbBase))
-            // Key grid: 6 columns × 3 rows
-            for row in 0..<3 {
-                let ky = 12.2 + CGFloat(row) * 1.0
-                for col in 0..<6 {
-                    let kx = 0.3 + CGFloat(col) * 2.5
-                    let w: CGFloat = (col == 2 && row == 1) ? 4.5 : 2.0
-                    c.fill(Path(v.r(kx, ky, w, 0.7)), with: .color(Self.kbKey))
-                }
-            }
-            // Key flashes synced with arm hits
-            if leftHit {
-                let row = leftKeyCol % 3
-                let kx = 0.3 + CGFloat(leftKeyCol) * 2.5
-                let ky = 12.2 + CGFloat(row) * 1.0
-                c.fill(Path(v.r(kx, ky, 2.0, 0.7)), with: .color(Self.kbHi.opacity(0.9)))
-            }
-            if rightHit {
-                let row = (rightKeyCol - 3) % 3
-                let kx = 0.3 + CGFloat(rightKeyCol) * 2.5
-                let ky = 12.2 + CGFloat(row) * 1.0
-                c.fill(Path(v.r(kx, ky, 2.0, 0.7)), with: .color(Self.kbHi.opacity(0.9)))
-            }
-
-            // 6. Arms on top — pivot at body connection (inner edge of arm)
-            c.fill(armPath(v, x: 0, y: 9, w: 2, h: 2, pivotX: 2, pivotY: 10,
-                           angle: armL, dy: dy), with: .color(Self.bodyC))
-            c.fill(armPath(v, x: 13, y: 9, w: 2, h: 2, pivotX: 13, pivotY: 10,
-                           angle: armR, dy: dy), with: .color(Self.bodyC))
+            // Eyes — on top of the body
+            let eyeY = 8 + (1.6 - eyeH) / 2
+            c.fill(Path(v.r(4.3 + sway, eyeY, 1, eyeH)), with: .color(Self.eyeC))
+            c.fill(Path(v.r(9.7 + sway, eyeY, 1, eyeH)), with: .color(Self.eyeC))
         }
+    }
+
+    private func drawCurl(_ c: GraphicsContext, v: V, shoulderX: CGFloat, raise: CGFloat) {
+        let shoulderY: CGFloat = 9
+        let fistY: CGFloat = 12 - raise * CGFloat(curlArmRaise)
+        let top = min(shoulderY, fistY)
+        let armH = abs(shoulderY - fistY) + 1.7
+        // Arm (slightly darker than body)
+        c.fill(Path(v.r(shoulderX, top, 1.2, armH)), with: .color(Self.armC))
+
+        // Dumbbell: [weight] ─ bar ─ [weight], centred on the fist
+        let fistCenter = shoulderX + 0.6
+        let sizeMul = CGFloat(dumbbellSize)
+        let weightW: CGFloat = 1.9 * sizeMul
+        let weightH: CGFloat = 2.6 * sizeMul
+        let gap: CGFloat = 1.0 * sizeMul
+        let dumbbellW = weightW * 2 + gap
+        let dbX = fistCenter - dumbbellW / 2
+        let dbY = fistY - weightH / 2 + 0.3
+        let corner = v.s * 0.55 * sizeMul   // subtle round-off on the weights
+        // Left weight (rounded)
+        c.fill(Path(roundedRect: v.r(dbX, dbY, weightW, weightH), cornerRadius: corner),
+               with: .color(Self.dumbbellC))
+        // Connecting bar — thin, centred vertically between weights
+        let barH: CGFloat = 0.8 * sizeMul
+        c.fill(Path(v.r(dbX + weightW, dbY + (weightH - barH) / 2, gap, barH)),
+               with: .color(Self.dumbbellC))
+        // Right weight (rounded)
+        c.fill(Path(roundedRect: v.r(dbX + weightW + gap, dbY, weightW, weightH), cornerRadius: corner),
+               with: .color(Self.dumbbellC))
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

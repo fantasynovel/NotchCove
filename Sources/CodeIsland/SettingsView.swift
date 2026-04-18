@@ -794,6 +794,12 @@ private struct AppearancePage: View {
                 Toggle(l10n["show_agent_details"], isOn: $showAgentDetails)
                 Toggle(l10n["show_tool_status"], isOn: $showToolStatus)
             }
+
+            Section("Mascot") {
+                Button("Open Mascot Lab…") {
+                    MascotLabWindowController.shared.show()
+                }
+            }
         }
         .formStyle(.grouped)
     }
