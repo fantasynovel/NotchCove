@@ -940,9 +940,9 @@ final class AppState {
         refreshDerivedState()
     }
 
-    func approvePermission(always: Bool = false) {
-        guard !permissionQueue.isEmpty else { return }
-        let pending = permissionQueue.removeFirst()
+    func approvePermission(at index: Int = 0, always: Bool = false) {
+        guard permissionQueue.indices.contains(index) else { return }
+        let pending = permissionQueue.remove(at: index)
         let sessionId = pending.event.sessionId ?? "default"
         dismissedPermissionSessionIds.remove(sessionId)
         let responseData: Data
@@ -974,9 +974,9 @@ final class AppState {
         refreshDerivedState()
     }
 
-    func denyPermission() {
-        guard !permissionQueue.isEmpty else { return }
-        let pending = permissionQueue.removeFirst()
+    func denyPermission(at index: Int = 0) {
+        guard permissionQueue.indices.contains(index) else { return }
+        let pending = permissionQueue.remove(at: index)
         let sessionId = pending.event.sessionId ?? "default"
         dismissedPermissionSessionIds.remove(sessionId)
         let response = #"{"hookSpecificOutput":{"hookEventName":"PermissionRequest","decision":{"behavior":"deny"}}}"#

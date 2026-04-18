@@ -1803,6 +1803,14 @@ private struct SessionCard: View {
         }
     }
 
+    private var inlineAlwaysBg: Color {
+        switch session.source {
+        case "claude": return Color(hex: "#E16503")
+        case "codex": return Color(hex: "#6E59F8")
+        default: return Color(hex: "#3B7ACF")
+        }
+    }
+
     private func inlineActionButton(
         _ label: String,
         fg: Color,
@@ -1810,7 +1818,7 @@ private struct SessionCard: View {
         enabled: Bool,
         action: @escaping () -> Void
     ) -> some View {
-        Button(action: action) {
+        Button(action: { if enabled { action() } }) {
             Text(label)
                 .font(.system(size: max(10, fontSize - 1), weight: .semibold, design: .monospaced))
                 .foregroundStyle(fg)
@@ -1818,15 +1826,12 @@ private struct SessionCard: View {
                 .padding(.vertical, 5)
                 .background(
                     RoundedRectangle(cornerRadius: 5)
-                        .fill(bg.opacity(enabled ? 1 : 0.35))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 5)
-                        .strokeBorder(.white.opacity(enabled ? 0.25 : 0.12), lineWidth: 1)
+                        .fill(bg)
                 )
         }
         .buttonStyle(.plain)
-        .disabled(!enabled)
+        .opacity(enabled ? 1 : 0.55)
+        .allowsHitTesting(enabled)
         .opacity(enabled ? 1 : 0.55)
     }
 
@@ -1894,34 +1899,44 @@ private struct SessionCard: View {
                             .foregroundStyle(.white.opacity(0.65))
                             .lineLimit(1)
                             .truncationMode(.tail)
+                        if !isActiveApproval {
+                            Text(L10n.shared["status_waiting"])
+                                .font(.system(size: max(9, fontSize - 2), weight: .semibold, design: .monospaced))
+                                .foregroundStyle(Color(hex: "#F3A953"))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 3).fill(Color(hex: "#F3A953").opacity(0.15))
+                                )
+                        }
                         Spacer(minLength: 8)
                         inlineActionButton(
                             showApprovalDetails ? L10n.shared["approval_details_collapse"] : L10n.shared["approval_details_expand"],
                             fg: .white,
-                            bg: Color.white.opacity(0.10),
+                            bg: Color(hex: "#313030"),
                             enabled: true,
                             action: { withAnimation(NotchAnimation.micro) { showApprovalDetails.toggle() } }
                         )
                         inlineActionButton(
-                            L10n.shared["allow_once"],
-                            fg: .white,
-                            bg: Color(red: 0.25, green: 0.65, blue: 0.35),
-                            enabled: isActiveApproval,
-                            action: { appState.approvePermission(always: false) }
-                        )
-                        inlineActionButton(
                             L10n.shared["always"],
                             fg: .white,
-                            bg: Color(red: 0.25, green: 0.55, blue: 0.85),
-                            enabled: isActiveApproval,
-                            action: { appState.approvePermission(always: true) }
+                            bg: inlineAlwaysBg,
+                            enabled: true,
+                            action: { appState.approvePermission(at: approvalQueueIndex ?? 0, always: true) }
+                        )
+                        inlineActionButton(
+                            L10n.shared["allow_once"],
+                            fg: Color(hex: "#1B2839"),
+                            bg: Color(hex: "#FFFFFF"),
+                            enabled: true,
+                            action: { appState.approvePermission(at: approvalQueueIndex ?? 0, always: false) }
                         )
                         inlineActionButton(
                             L10n.shared["deny"],
                             fg: .white,
-                            bg: Color(red: 0.85, green: 0.3, blue: 0.3),
-                            enabled: isActiveApproval,
-                            action: { appState.denyPermission() }
+                            bg: Color(hex: "#BC011C"),
+                            enabled: true,
+                            action: { appState.denyPermission(at: approvalQueueIndex ?? 0) }
                         )
                     }
 
