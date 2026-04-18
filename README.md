@@ -1,179 +1,197 @@
-# My Island
+<h1 align="center">
+  <img src="logo.png" width="48" height="48" alt="NotchCove Logo" valign="middle">&nbsp;
+  NotchCove
+</h1>
+<p align="center">
+  <b>Real-time AI coding agent status in your MacBook notch</b><br>
+  <a href="#install">Install</a> •
+  <a href="#features">Features</a> •
+  <a href="#supported-tools">Supported Tools</a> •
+  <a href="#build-from-source">Build</a><br>
+  English | <a href="README.zh-TW.md">繁體中文</a>
+</p>
 
-> **⚠️ 這是一份模板**:將 `[方括號]` 內容換成你自己的。`[實際 app 名]` 改成你決定的名字(例:My Island、Dev Notch 等)。
-
-**Real-time AI coding agent status in your MacBook notch**
-
-[![Release](https://img.shields.io/github/v/release/你的handle/my-island?style=flat-square)](https://github.com/你的handle/my-island/releases)
-[![macOS](https://img.shields.io/badge/macOS-14%2B-black?style=flat-square&logo=apple)](https://github.com/你的handle/my-island/releases)
-[![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](./LICENSE)
-
-[Install](#install) · [Features](#features) · [Supported Tools](#supported-tools) · [Build](#build-from-source)
-
-[English] | [中文](./README.zh-TW.md)
+<p align="center">
+  <a href="https://github.com/fantasynovel/NotchCove/releases"><img src="https://img.shields.io/github/v/release/fantasynovel/NotchCove?style=flat-square" alt="Release"></a>
+  <a href="https://github.com/fantasynovel/NotchCove/releases"><img src="https://img.shields.io/badge/macOS-14%2B-black?style=flat-square&logo=apple" alt="macOS"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License"></a>
+</p>
 
 ---
 
-## What is My Island?
+<p align="center">
+  <img src="docs/images/notch-panel.png" width="700" alt="NotchCove Panel Preview">
+</p>
 
-My Island lives in your MacBook's notch area and shows you what your AI coding agents are doing — in real time. No more switching windows to check if Claude is waiting for approval or if Codex finished its task.
+## What is NotchCove?
 
-It connects to multiple AI coding tools via Unix socket IPC, displaying session status, tool calls, permission requests, and more — all in a compact panel that slides out of the notch.
+NotchCove lives in your MacBook's notch area and shows you what your AI coding agents are doing — in real time. No more switching windows to check if Claude is waiting for approval or if Codex finished its task.
 
-![Screenshot](docs/images/screenshot.png)
+It connects to multiple AI coding tools via Unix socket IPC, displaying session status, tool calls, permission requests, and more — all in a compact pixel-style panel that slides out of the notch.
 
 ---
 
 ## Features
 
 - **Notch-native UI** — Expands from the MacBook notch, collapses when idle
-- **Multiple AI agents supported** — Claude Code, Codex, Cursor, Gemini CLI, [...你加的 agent]
+- **Compact notch mode** — Extra-tight collapsed layout for minimalist workflows
+- **11 AI tools supported** — Claude Code, Codex, Gemini CLI, Cursor, Copilot, Trae/TraeCli, Qoder, Factory, CodeBuddy, OpenCode, Kimi Code CLI
 - **Live status tracking** — See active sessions, tool calls, and AI responses in real time
-- **One-click permission approval** — Approve or deny tool permissions directly from the panel
-- **Interactive Q&A** — Respond to agent questions without switching to terminal
-- **Precise terminal jump** — Click a session to jump to its terminal tab or IDE window
-- **Auto hook install** — Automatically configures hooks for all detected CLI tools
+- **Out-of-order permission approval** — Approve or deny tool permissions in any order, directly from the panel
+- **Interactive Q&A** — Respond to agent questions without leaving the notch
+- **Pixel mascots + Mascot Lab** — Each AI tool has its own animated pixel mascot; preview and tune them in the dedicated Mascot Lab tab
+- **Working animations** — Playful loaders (e.g. dumbbell curls for Claude) instead of generic spinners
+- **Precise terminal jump** — Click a session to jump to its exact terminal tab or IDE window
+- **Smart notification suppression** — Tab-level detection: only suppresses notifications when you're actually looking at that session's tab
+- **Auto hook install** — Automatically configures hooks for all detected CLI tools, with auto-repair and version tracking
+- **Keyboard shortcuts** — Dedicated Shortcuts settings tab for global hotkeys
+- **Remote panel** — Receive events from a remote machine via the Remote tab
+- **Bilingual UI** — Traditional Chinese + English, follows system language
 - **Multi-display** — Works with external monitors, graceful fallback on non-notch Macs
-- **[你的特色功能 1]** — [描述]
-- **[你的特色功能 2]** — [描述]
+- **Sound effects** — Optional 8-bit style audio cues
 
 ---
 
 ## Supported Tools
 
-| AI Agent | Events | Terminal Jump | Status |
-|---|---|---|---|
-| Claude Code | 13 | Terminal tab | Full |
-| Codex | 3 | Terminal | Basic |
-| Cursor | 10 | IDE | Full |
-| [...] | ... | ... | ... |
+| | Tool | Events | Jump | Status |
+|:---:|------|--------|------|--------|
+| <img src="docs/images/mascots/claude.gif" width="28"> | <img src="Sources/CodeIsland/Resources/cli-icons/claude.png" width="16"> Claude Code | 13 | Terminal tab | Full |
+| <img src="docs/images/mascots/codex.gif" width="28"> | <img src="Sources/CodeIsland/Resources/cli-icons/codex.png" width="16"> Codex | 3 | Terminal | Basic |
+| <img src="docs/images/mascots/gemini.gif" width="28"> | <img src="Sources/CodeIsland/Resources/cli-icons/gemini.png" width="16"> Gemini CLI | 6 | Terminal | Full |
+| <img src="docs/images/mascots/cursor.gif" width="28"> | <img src="Sources/CodeIsland/Resources/cli-icons/cursor.png" width="16"> Cursor | 10 | IDE | Full |
+| <img src="docs/images/mascots/trae.gif" width="28"> | <img src="Sources/CodeIsland/Resources/cli-icons/traecli.png" width="16"> TraeCli | 10 | Terminal | Full |
+| <img src="docs/images/mascots/qoder.gif" width="28"> | <img src="Sources/CodeIsland/Resources/cli-icons/qoder.png" width="16"> Qoder | 10 | IDE | Full |
+| | <img src="Sources/CodeIsland/Resources/cli-icons/copilot.png" width="16"> Copilot | 6 | Terminal | Full |
+| <img src="docs/images/mascots/factory.gif" width="28"> | <img src="Sources/CodeIsland/Resources/cli-icons/factory.png" width="16"> Factory | 10 | IDE | Full |
+| <img src="docs/images/mascots/codebuddy.gif" width="28"> | <img src="Sources/CodeIsland/Resources/cli-icons/codebuddy.png" width="16"> CodeBuddy | 10 | App/Terminal | Full |
+| | <img src="Sources/CodeIsland/Resources/cli-icons/kimi.png" width="16"> Kimi Code CLI | 10 | Terminal | Full |
+| <img src="docs/images/mascots/opencode.gif" width="28"> | <img src="Sources/CodeIsland/Resources/cli-icons/opencode.png" width="16"> OpenCode | All | App/Terminal | Full |
 
 | Terminal | Detection | Jump-to-Tab |
-|---|---|---|
-| iTerm2 | Auto | ✅ Tab level |
-| Ghostty | Auto | ✅ Window level |
-| Terminal.app | Auto | ✅ Tab level |
-| VS Code | Auto | ✅ Folder level |
-| Cursor | Auto | ✅ Folder level |
-| [...] | ... | ... |
+|----------|-----------|-------------|
+| iTerm2 | Auto | Tab level |
+| Ghostty | Auto | Window level |
+| Terminal.app | Auto | Tab level |
+| VS Code | Auto | Folder level |
+| Cursor | Auto | Folder level |
 
 ---
 
 ## Install
 
-### Download (Recommended)
-
-1. Go to [Releases](https://github.com/你的handle/my-island/releases)
-2. Download `MyIsland.dmg`
-3. Open the DMG and drag My Island to `Applications`
-4. Launch — it will automatically install hooks for detected AI tools
-
-**First launch**: macOS may show a security warning if the app is not notarized.
-Right-click My Island → **Open** → **Open** in the dialog.
-
-Or run once in Terminal:
-```bash
-xattr -dr com.apple.quarantine "/Applications/My Island.app"
-```
-
 ### Homebrew (coming soon)
 
 ```bash
-# 未來有 tap 再填
-# brew install --cask 你的handle/tap/my-island
+# Not published yet — see manual install below
+# brew tap fantasynovel/tap
+# brew install --cask notchcove
+```
+
+### Manual Download
+
+1. Go to [Releases](https://github.com/fantasynovel/NotchCove/releases)
+2. Download `NotchCove.dmg`
+3. Open the DMG and drag `NotchCove.app` into `Applications`
+4. Launch — hooks are installed automatically for every detected AI tool
+
+**First launch:** macOS may show a security warning if the build is not notarized yet.
+Right-click `NotchCove.app` → **Open** → **Open** in the dialog, or run:
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/NotchCove.app"
 ```
 
 ### Build from Source
 
-**Requirements**:
-- macOS 14.0+
-- Xcode 15+ with Command Line Tools
-- Swift 5.9+
+**Requirements:** macOS 14.0+, Xcode 15+, Swift 5.9+
 
 ```bash
-git clone https://github.com/你的handle/my-island.git
-cd my-island
+git clone https://github.com/fantasynovel/NotchCove.git
+cd NotchCove
 
 # Development build
-swift build && open .build/debug/MyIsland.app
+swift build && ./.build/debug/CodeIsland
 
-# Release build
+# Release build (universal binary: Apple Silicon + Intel)
 ./build.sh
-open .build/release/MyIsland.app
+open .build/release/CodeIsland.app
 ```
 
-詳見 [docs/packaging.md](./docs/packaging.md) 中的打包與簽章流程。
+> Note: the Swift target is still named `CodeIsland` internally from the original fork. A full code-level rename to `NotchCove` is planned for a future release.
 
 ---
 
 ## First-Time Setup
 
-當 app 第一次啟動,會做這些事:
+On first launch, NotchCove will:
 
-1. **安裝 hooks** 到 `~/.claude/hooks/`(Claude Code 會用)
-2. **請求權限**:
-   - **Accessibility** — 讓 app 能切換 terminal tab
-   - **Automation → iTerm2 / Ghostty / ...** — AppleScript 控制 terminal
-   - **Notifications** — 顯示通知(可選)
-3. **建立 Unix socket** 於 `/tmp/myisland-{UID}.sock` 監聽事件
+1. **Install hooks** into `~/.claude/hooks/` (and the equivalent paths for other AI tools)
+2. **Request permissions:**
+   - **Accessibility** — so the app can switch terminal tabs
+   - **Automation → iTerm2 / Ghostty / …** — AppleScript control for terminals
+   - **Notifications** — optional, for system notifications
+3. **Create a Unix socket** at `/tmp/codeisland-<UID>.sock` to listen for events
 
-如果你拒絕了某些權限,功能會降級但 app 仍可運作。可以之後在 系統設定 → 隱私權 補開。
+If you deny any permission, related features degrade gracefully and can be re-enabled later in **System Settings → Privacy & Security**.
 
 ---
 
 ## How It Works
 
 ```
-AI Tool (Claude/Codex/Cursor/...)
+AI Tool (Claude/Codex/Gemini/Cursor/...)
   → Hook event triggered
-    → myisland-bridge (Swift binary)
-      → Unix socket → /tmp/myisland-<uid>.sock
-        → My Island app receives event
-          → Updates notch panel UI in real time
+    → codeisland-bridge (native Swift binary, ~86KB)
+      → Unix socket → /tmp/codeisland-<uid>.sock
+        → NotchCove app receives the event
+          → Notch panel updates in real time
 ```
 
-My Island 在每個 AI tool 的設定裡裝輕量 hook。當 tool 觸發事件(session 開始、tool call、permission 請求等),hook 會把 JSON 訊息透過 Unix socket 送給 my-island app,app 就即時更新瀏海面板。
+NotchCove installs lightweight hooks in each AI tool's config. When a tool fires an event (session start, tool call, permission request, …), the hook sends a JSON message over a Unix socket. NotchCove listens on that socket and updates the notch panel immediately.
 
-更多細節見 [docs/architecture.md](./docs/architecture.md)。
+**OpenCode** uses a JS plugin that talks to the socket directly — no bridge binary needed.
+
+More details in [docs/research/02-hook-protocol.md](./docs/research/02-hook-protocol.md) and [docs/research/03-unix-socket.md](./docs/research/03-unix-socket.md).
 
 ---
 
 ## Settings
 
-My Island 提供 [N] 個設定分頁:
+NotchCove ships with 9 settings tabs:
 
-- **General** — 語言、登入時啟動、預設螢幕
-- **Behavior** — 自動收起、聰明抑制、session 清理
-- **Appearance** — 面板高度、字型大小、AI 回覆顯示行數
-- **Sound** — 通知音效
-- **Hooks** — 查看 CLI 安裝狀態,重裝或卸載 hooks
-- **[你加的分頁]** — [描述]
-- **About** — 版本資訊
+- **General** — Language, launch at login, preferred display
+- **Behavior** — Auto-hide, smart suppression, session cleanup
+- **Appearance** — Panel height, font size, chat-row colors, live preview
+- **Mascots** — Mascot Lab: preview every pixel character and its animations
+- **Sound** — 8-bit style audio notifications
+- **Shortcuts** — Global keyboard shortcuts
+- **Remote** — Receive events from a remote machine
+- **Hooks** — Installation status per CLI, reinstall or uninstall
+- **About** — Version info and links
 
 ---
 
 ## Privacy
 
-My Island **完全 local-first**:
+NotchCove is **local-first**:
 
-- ✅ 所有資料存在你 Mac 上
-- ✅ 沒有帳號系統
-- ✅ 沒有遙測 / 分析
-- ✅ 不傳送對話內容到任何伺服器
-
-(如果你之後加了 iPhone 同步功能,記得來更新這段,並新增 [PRIVACY.md](./PRIVACY.md))
+- All data stays on your Mac
+- No account system
+- No telemetry, no analytics
+- No conversation content is sent anywhere
 
 ---
 
 ## Acknowledgments
 
-My Island 是從 [wxtsky/CodeIsland](https://github.com/wxtsky/CodeIsland) 修改而來,向原作者的工作致敬。
+NotchCove is a fork of [wxtsky/CodeIsland](https://github.com/wxtsky/CodeIsland), with credit to the original author.
 
-CodeIsland 受啟發於 [farouqaldori/claude-island](https://github.com/farouqaldori/claude-island)。
+CodeIsland was itself inspired by [farouqaldori/claude-island](https://github.com/farouqaldori/claude-island).
 
-在此一併感謝這些開源先驅:
+Thanks to:
 - [@wxtsky](https://github.com/wxtsky) — CodeIsland
-- [@farouqaldori](https://github.com/farouqaldori) — 最早把 AI agent 狀態帶進瀏海的原創概念
+- [@farouqaldori](https://github.com/farouqaldori) — the original concept of surfacing AI agent state in the notch
 
 See [NOTICE](./NOTICE) for full attribution.
 
@@ -181,11 +199,9 @@ See [NOTICE](./NOTICE) for full attribution.
 
 ## Contributing
 
-歡迎參與!見 [CONTRIBUTING.md](./CONTRIBUTING.md)。
-
-- 回報 bug:[Open an issue](https://github.com/你的handle/my-island/issues/new?template=bug_report.md)
-- 功能建議:[Open an issue](https://github.com/你的handle/my-island/issues/new?template=feature_request.md)
-- 程式碼貢獻:Fork → branch → PR
+- Report a bug: [Open an issue](https://github.com/fantasynovel/NotchCove/issues/new?template=bug_report.md)
+- Suggest a feature: [Open an issue](https://github.com/fantasynovel/NotchCove/issues/new?template=feature_request.md)
+- Code contributions: fork → branch → PR
 
 ---
 
@@ -195,29 +211,16 @@ See [NOTICE](./NOTICE) for full attribution.
 
 ---
 
-## Star History
-
-<!-- 有一些 stars 後可以加這個 -->
-<!-- [![Star History](https://api.star-history.com/svg?repos=你的handle/my-island&type=Date)](https://star-history.com/#你的handle/my-island&Date) -->
-
----
-
 ## FAQ
 
-**Q: 這跟 CodeIsland 有什麼不同?**
-A: [你的差異化點]
+**Q: How is this different from CodeIsland?**
+A: NotchCove focuses on a more compact notch layout, revised chat styling, a Mascot Lab for pixel characters, out-of-order permission approval, keyboard shortcuts, and a Remote panel.
 
-**Q: 為什麼不直接用 CodeIsland?**
-A: [你的動機]
+**Q: Does NotchCove work without running?**
+A: Hooks are designed to fail open — when the app isn't running, they silently pass through, and your AI tools keep working normally.
 
-**Q: 支援 Linux 嗎?**
-A: 不支援。App 深度依賴 macOS 的 NSPanel、AppleScript、notch 偵測。
+**Q: Linux / Windows support?**
+A: No. The app depends heavily on macOS NSPanel, AppleScript, and notch detection.
 
-**Q: 支援 Windows 嗎?**
-A: 不支援,同上。
-
-**Q: App 沒開會不會影響 Claude Code?**
-A: 不會。Hook 設計成 fail open — app 沒在跑時,hook 直接放行,Claude Code 正常運作。
-
-**Q: 為什麼每次 build 都要重新給權限?**
-A: 這是 macOS TCC 的限制。見 [docs/research/05-macos-permissions.md](./docs/research/05-macos-permissions.md)。
+**Q: Why do permissions re-prompt on every rebuild?**
+A: macOS TCC ties permissions to a signed binary identity. Unsigned dev builds get a new identity each time. See [docs/research/05-macos-permissions.md](./docs/research/05-macos-permissions.md).

@@ -81,6 +81,14 @@ enum SettingsKey {
     // Island collapsed width scale for non-notch screens (percentage: 50–150, default 100)
     static let collapsedWidthScale = "collapsedWidthScale"
 
+    // Compact-bar layout style: "extended" (default, with side wings) or "compact" (Claude Island style, stays inside notch)
+    static let notchLayoutMode = "notchLayoutMode"
+
+    // Clawd (Claude) mascot — dumbbell-curl work animation tuning (Mascot Lab)
+    static let clawdCurlCycleMs = "clawdCurlCycleMs"
+    static let clawdCurlArmRaise = "clawdCurlArmRaise"
+    static let clawdCurlSway = "clawdCurlSway"
+    static let clawdDumbbellSize = "clawdDumbbellSize"
 }
 
 struct SettingsDefaults {
@@ -98,7 +106,7 @@ struct SettingsDefaults {
 
     static let maxPanelHeight = 560
     static let maxVisibleSessions = 5
-    static let contentFontSize = 11
+    static let contentFontSize = 12
     static let aiMessageLines = 1
     static let showAgentDetails = false
     static let notchHeightMode = NotchHeightMode.matchNotch.rawValue
@@ -123,7 +131,18 @@ struct SettingsDefaults {
 
     static let showToolStatus = true
 
-    static let collapsedWidthScale = 100  // percentage
+    static let collapsedWidthScale = 100  // percentage; 100% == real notch width
+    static let notchLayoutMode = NotchLayoutMode.extended.rawValue
+
+    static let clawdCurlCycleMs = 1200     // 500..2500
+    static let clawdCurlArmRaise = 7.5     // 3.0..8.0 (svg units)
+    static let clawdCurlSway = 0.18        // 0..0.5
+    static let clawdDumbbellSize = 1.15   // multiplier: 0.5..2.0
+}
+
+enum NotchLayoutMode: String, CaseIterable {
+    case extended   // default — left/right wings extend beyond the notch
+    case compact    // Claude Island style — stays within the notch
 }
 
 @MainActor
@@ -166,6 +185,11 @@ class SettingsManager {
             SettingsKey.sessionGroupingMode: SettingsDefaults.sessionGroupingMode,
             SettingsKey.showToolStatus: SettingsDefaults.showToolStatus,
             SettingsKey.collapsedWidthScale: SettingsDefaults.collapsedWidthScale,
+            SettingsKey.notchLayoutMode: SettingsDefaults.notchLayoutMode,
+            SettingsKey.clawdCurlCycleMs: SettingsDefaults.clawdCurlCycleMs,
+            SettingsKey.clawdCurlArmRaise: SettingsDefaults.clawdCurlArmRaise,
+            SettingsKey.clawdCurlSway: SettingsDefaults.clawdCurlSway,
+            SettingsKey.clawdDumbbellSize: SettingsDefaults.clawdDumbbellSize,
         ])
     }
 

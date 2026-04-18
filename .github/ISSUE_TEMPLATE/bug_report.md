@@ -26,7 +26,7 @@ Steps to reproduce the behavior:
 
 ## Environment (required)
 
-- **My Island version**: (例:0.1.0,可在 About 看到)
+- **NotchCove version**: (例:0.1.0,可在 About 看到)
 - **macOS version**: (執行 `sw_vers` 貼結果)
 - **Mac model**: (例:MacBook Pro 14" M3)
 - **AI tool causing issue**: (例:Claude Code 1.2.3)
@@ -35,9 +35,9 @@ Steps to reproduce the behavior:
 ## Relevant logs
 <!--
 App log 位置:
-  ~/Library/Logs/MyIsland/  (如果有寫 log 到這)
+  ~/Library/Logs/NotchCove/  (如果有寫 log 到這)
 或在 terminal 跑
-  log stream --predicate 'subsystem == "com.你的handle.myisland"'
+  log stream --predicate 'subsystem == "com.codeisland.app"'
 把相關片段貼上來。**請檢查不要包含個人資料**。
 -->
 

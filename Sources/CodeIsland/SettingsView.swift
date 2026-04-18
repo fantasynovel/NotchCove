@@ -2,6 +2,20 @@ import SwiftUI
 import UniformTypeIdentifiers
 import CodeIslandCore
 
+// MARK: - Settings Typography
+
+private let settingsDescColor = Color(red: 112.0/255.0, green: 111.0/255.0, blue: 111.0/255.0)
+
+private extension View {
+    func settingsTitle() -> some View {
+        self.font(.system(size: 15, weight: .regular))
+    }
+    func settingsDesc() -> some View {
+        self.font(.system(size: 12))
+            .foregroundStyle(settingsDescColor)
+    }
+}
+
 // MARK: - Navigation Model
 
 enum SettingsPage: String, Identifiable, Hashable {
@@ -53,7 +67,7 @@ private struct SidebarGroup: Hashable {
 
 private let sidebarGroups: [SidebarGroup] = [
     SidebarGroup(title: nil, pages: [.general, .behavior, .appearance, .mascots, .sound, .shortcuts]),
-    SidebarGroup(title: "CodeIsland", pages: [.remote, .hooks, .about]),
+    SidebarGroup(title: "Notch Cove", pages: [.remote, .hooks, .about]),
 ]
 
 // MARK: - Main View
@@ -115,18 +129,18 @@ private struct RemoteHostsPage: View {
 
     var body: some View {
         Form {
-            Section(l10n["remote_hosts"]) {
+            Section {
                 if remoteManager.hosts.isEmpty {
                     Text(l10n["remote_hosts_empty"])
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.primary)
                 } else {
                     ForEach(remoteManager.hosts) { remoteHost in
                         RemoteHostRow(host: remoteHost)
                     }
                 }
-            }
+            } header: { Text(l10n["remote_hosts"]).foregroundStyle(settingsDescColor) }
 
-            Section(l10n["add_remote_host"]) {
+            Section {
                 TextField(l10n["remote_name"], text: $name)
                 TextField(l10n["remote_host"], text: $host)
                 TextField(l10n["remote_user"], text: $user)
@@ -134,7 +148,7 @@ private struct RemoteHostsPage: View {
                 TextField(l10n["remote_identity"], text: $identityFile)
                 TextField(l10n["remote_auth_socket"], text: $authSocket,
                           prompt: Text(l10n["remote_auth_socket_placeholder"]))
-                Toggle(l10n["remote_auto_connect"], isOn: $autoConnect)
+                Toggle(isOn: $autoConnect) { Text(l10n["remote_auto_connect"]).settingsTitle() }
 
                 Button(l10n["remote_add_button"]) {
                     let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -161,15 +175,15 @@ private struct RemoteHostsPage: View {
                 }
                 .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                     || host.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            }
+            } header: { Text(l10n["add_remote_host"]).foregroundStyle(settingsDescColor) }
 
             Section {
                 Text(l10n["remote_hint"])
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .settingsDesc()
             }
         }
         .formStyle(.grouped)
+        .font(.system(size: 14))
     }
 }
 
@@ -198,11 +212,11 @@ private struct RemoteHostRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(host.name)
                     Text(host.displayAddress)
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 12, design: .monospaced))
+                        .foregroundStyle(.primary)
                 }
                 Spacer()
                 if remoteManager.installRunning[host.id] == true {
@@ -212,13 +226,11 @@ private struct RemoteHostRow: View {
             }
 
             Text(statusText)
-                .font(.system(size: 11))
-                .foregroundStyle(.secondary)
+                .settingsDesc()
 
             if let message = remoteManager.lastMessage[host.id], !message.isEmpty {
                 Text(message)
-                    .font(.system(size: 11))
-                    .foregroundStyle(.tertiary)
+                    .settingsDesc()
                     .lineLimit(2)
             }
 
@@ -264,7 +276,7 @@ private struct SidebarRow: View {
     var body: some View {
         Label {
             Text(l10n[page.rawValue])
-                .font(.system(size: 13))
+                .font(.system(size: 14))
                 .padding(.leading, 2)
         } icon: {
             ZStack {
@@ -294,28 +306,30 @@ private struct GeneralPage: View {
     var body: some View {
         Form {
             Section {
-                Picker(l10n["language"], selection: $l10n.language) {
+                Picker(selection: $l10n.language) {
                     Text(l10n["system_language"]).tag("system")
                     Text("English").tag("en")
-                    Text("中文").tag("zh")
+                    Text("简体中文").tag("zh")
+                    Text("繁體中文").tag("zh-Hant")
                     Text("日本語").tag("ja")
                     Text("한국어").tag("ko")
                     Text("Türkçe").tag("tr")
+                } label: {
+                    Text(l10n["language"]).settingsTitle()
                 }
-                Toggle(l10n["launch_at_login"], isOn: $launchAtLogin)
+                Toggle(isOn: $launchAtLogin) { Text(l10n["launch_at_login"]).settingsTitle() }
                     .onChange(of: launchAtLogin) { _, v in
                         SettingsManager.shared.launchAtLogin = v
                     }
-                Toggle(l10n["allow_horizontal_drag"], isOn: $allowHorizontalDrag)
+                Toggle(isOn: $allowHorizontalDrag) { Text(l10n["allow_horizontal_drag"]).settingsTitle() }
                     .onChange(of: allowHorizontalDrag) { _, enabled in
                         if !enabled {
                             SettingsManager.shared.panelHorizontalOffset = 0
                         }
                     }
                 Text(l10n["allow_horizontal_drag_desc"])
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Picker(l10n["display"], selection: $displayChoice) {
+                    .settingsDesc()
+                Picker(selection: $displayChoice) {
                     Text(l10n["auto"]).tag("auto")
                     ForEach(Array(NSScreen.screens.enumerated()), id: \.offset) { index, screen in
                         let name = screen.localizedName
@@ -323,10 +337,13 @@ private struct GeneralPage: View {
                         let label = isBuiltin ? l10n["builtin_display"] : name
                         Text(label).tag("screen_\(index)")
                     }
+                } label: {
+                    Text(l10n["display"]).settingsTitle()
                 }
             }
         }
         .formStyle(.grouped)
+        .font(.system(size: 14))
     }
 }
 
@@ -347,7 +364,7 @@ private struct BehaviorPage: View {
 
     var body: some View {
         Form {
-            Section(l10n["display_section"]) {
+            Section {
                 BehaviorToggleRow(
                     title: l10n["hide_in_fullscreen"],
                     desc: l10n["hide_in_fullscreen_desc"],
@@ -395,9 +412,9 @@ private struct BehaviorPage: View {
                     .pickerStyle(.segmented)
                     .padding(.leading, 84)
                 }
-            }
+            } header: { Text(l10n["display_section"]).foregroundStyle(settingsDescColor) }
 
-            Section(l10n["sessions"]) {
+            Section {
                 Picker(selection: $sessionTimeout) {
                     Text(l10n["no_cleanup"]).tag(0)
                     Text(l10n["10_minutes"]).tag(10)
@@ -405,8 +422,12 @@ private struct BehaviorPage: View {
                     Text(l10n["1_hour"]).tag(60)
                     Text(l10n["2_hours"]).tag(120)
                 } label: {
-                    Text(l10n["session_cleanup"])
-                    Text(l10n["session_cleanup_desc"])
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(l10n["session_cleanup"])
+                            .settingsTitle()
+                        Text(l10n["session_cleanup_desc"])
+                            .settingsDesc()
+                    }
                 }
                 Picker(selection: $rotationInterval) {
                     Text(l10n["3_seconds"]).tag(3)
@@ -414,8 +435,12 @@ private struct BehaviorPage: View {
                     Text(l10n["8_seconds"]).tag(8)
                     Text(l10n["10_seconds"]).tag(10)
                 } label: {
-                    Text(l10n["rotation_interval"])
-                    Text(l10n["rotation_interval_desc"])
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(l10n["rotation_interval"])
+                            .settingsTitle()
+                        Text(l10n["rotation_interval_desc"])
+                            .settingsDesc()
+                    }
                 }
                 Picker(selection: $maxToolHistory) {
                     Text("10").tag(10)
@@ -423,12 +448,17 @@ private struct BehaviorPage: View {
                     Text("50").tag(50)
                     Text("100").tag(100)
                 } label: {
-                    Text(l10n["tool_history_limit"])
-                    Text(l10n["tool_history_limit_desc"])
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(l10n["tool_history_limit"])
+                            .settingsTitle()
+                        Text(l10n["tool_history_limit_desc"])
+                            .settingsDesc()
+                    }
                 }
-            }
+            } header: { Text(l10n["sessions"]).foregroundStyle(settingsDescColor) }
         }
         .formStyle(.grouped)
+        .font(.system(size: 14))
     }
 }
 
@@ -459,7 +489,7 @@ private struct HooksPage: View {
 
     var body: some View {
         Form {
-            Section(l10n["cli_status"]) {
+            Section {
                 ForEach(ConfigInstaller.allCLIs, id: \.source) { cli in
                     let installed = cliStatuses[cli.source] ?? false
                     let exists = ConfigInstaller.cliExists(source: cli.source)
@@ -485,21 +515,21 @@ private struct HooksPage: View {
                     exists: ocExists
                 ) { _ in refreshCLIStatuses() }
                 .id("opencode-\(refreshKey)")
-            }
+            } header: { Text(l10n["cli_status"]).foregroundStyle(settingsDescColor) }
 
-            Section("Custom CLIs") {
+            Section {
                 let customItems = ConfigInstaller.customCLIConfigs()
                 if customItems.isEmpty {
                     Text("No custom CLI configured")
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.primary)
                 } else {
                     ForEach(customItems) { item in
                         HStack(alignment: .top, spacing: 8) {
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: 6) {
                                 Text(item.name)
                                 Text("\(item.source) · \(item.configPath)")
-                                    .font(.system(size: 11, design: .monospaced))
-                                    .foregroundStyle(.secondary)
+                                    .font(.system(size: 12, design: .monospaced))
+                                    .foregroundStyle(.primary)
                             }
                             Spacer()
                             Button(role: .destructive) {
@@ -550,9 +580,9 @@ private struct HooksPage: View {
                     refreshCLIStatuses()
                     refreshKey += 1
                 }
-            }
+            } header: { Text("Custom CLIs").foregroundStyle(settingsDescColor) }
 
-            Section(l10n["management"]) {
+            Section {
                 HStack(spacing: 8) {
                     Button {
                         // Enable all detected CLIs before reinstalling
@@ -601,12 +631,13 @@ private struct HooksPage: View {
                         Image(systemName: statusIsError ? "xmark.circle.fill" : "checkmark.circle.fill")
                             .foregroundStyle(statusIsError ? .red : .green)
                         Text(statusMessage)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.primary)
                     }
                 }
-            }
+            } header: { Text(l10n["management"]).foregroundStyle(settingsDescColor) }
         }
         .formStyle(.grouped)
+        .font(.system(size: 14))
         .onAppear { refreshCLIStatuses() }
     }
 }
@@ -636,29 +667,29 @@ private struct CLIStatusRow: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 8) {
                 if let icon = cliIcon(source: source, size: 20) {
                     Image(nsImage: icon)
                         .resizable()
                         .frame(width: 20, height: 20)
                 }
-                VStack(alignment: .leading, spacing: 1) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(name)
+                        .settingsTitle()
                     if !exists {
                         Text(l10n["not_detected"])
-                            .font(.system(size: 11))
-                            .foregroundStyle(.tertiary)
+                            .settingsDesc()
                     } else if installed {
                         HStack(spacing: 2) {
                             Text(configPath)
-                                .font(.system(size: 11, design: .monospaced))
-                                .foregroundStyle(.tertiary)
+                                .font(.system(size: 13, design: .monospaced))
+                                .foregroundStyle(settingsDescColor)
                             Button {
                                 NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: fullPath)])
                             } label: {
                                 Image(systemName: "arrow.right.circle")
-                                    .font(.system(size: 11))
+                                    .font(.system(size: 12))
                                     .foregroundStyle(.blue)
                             }
                             .buttonStyle(.plain)
@@ -691,6 +722,7 @@ private struct AppearancePage: View {
     @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
     @AppStorage(SettingsKey.notchHeightMode) private var notchHeightModeRaw = SettingsDefaults.notchHeightMode
     @AppStorage(SettingsKey.customNotchHeight) private var customNotchHeight = SettingsDefaults.customNotchHeight
+    @AppStorage(SettingsKey.notchLayoutMode) private var notchLayoutModeRaw = SettingsDefaults.notchLayoutMode
 
     private var notchHeightMode: Binding<NotchHeightMode> {
         Binding(
@@ -699,17 +731,24 @@ private struct AppearancePage: View {
         )
     }
 
+    private var notchLayoutMode: Binding<NotchLayoutMode> {
+        Binding(
+            get: { NotchLayoutMode(rawValue: notchLayoutModeRaw) ?? .extended },
+            set: { notchLayoutModeRaw = $0.rawValue }
+        )
+    }
+
     var body: some View {
         Form {
-            Section(l10n["preview"]) {
+            Section {
                 AppearancePreview(
                     fontSize: contentFontSize,
                     lineLimit: aiMessageLines,
                     showDetails: showAgentDetails
                 )
-            }
+            } header: { Text(l10n["preview"]).foregroundStyle(settingsDescColor) }
 
-            Section(l10n["panel"]) {
+            Section {
                 Picker(selection: $maxVisibleSessions) {
                     Text("3").tag(3)
                     Text("5").tag(5)
@@ -717,67 +756,101 @@ private struct AppearancePage: View {
                     Text("10").tag(10)
                     Text(l10n["unlimited"]).tag(99)
                 } label: {
-                    Text(l10n["max_visible_sessions"])
-                    Text(l10n["max_visible_sessions_desc"])
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(l10n["max_visible_sessions"])
+                            .settingsTitle()
+                        Text(l10n["max_visible_sessions_desc"])
+                            .settingsDesc()
+                    }
                 }
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     HStack {
                         Text(l10n["collapsed_width_scale"])
+                            .settingsTitle()
                         Spacer()
                         Text("\(collapsedWidthScale)%")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.primary)
                             .monospacedDigit()
                     }
                     Slider(value: Binding(
                         get: { Double(collapsedWidthScale) },
                         set: { collapsedWidthScale = Int($0) }
-                    ), in: 50...150, step: 10)
+                    ), in: 100...150, step: 10)
                     Text(l10n["collapsed_width_scale_desc"])
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .settingsDesc()
                 }
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Picker(selection: notchLayoutMode) {
+                        Text(l10n["notch_layout_extended"]).tag(NotchLayoutMode.extended)
+                        Text(l10n["notch_layout_compact"]).tag(NotchLayoutMode.compact)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(l10n["notch_layout_mode"])
+                                .settingsTitle()
+                            Text(l10n["notch_layout_mode_desc"])
+                                .settingsDesc()
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+                VStack(alignment: .leading, spacing: 6) {
                     Picker(selection: notchHeightMode) {
                         Text(l10n["notch_height_match_notch"]).tag(NotchHeightMode.matchNotch)
                         Text(l10n["notch_height_match_menubar"]).tag(NotchHeightMode.matchMenuBar)
                         Text(l10n["notch_height_custom"]).tag(NotchHeightMode.custom)
                     } label: {
-                        Text(l10n["notch_height_mode"])
-                        Text(l10n["notch_height_mode_desc"])
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(l10n["notch_height_mode"])
+                                .settingsTitle()
+                            Text(l10n["notch_height_mode_desc"])
+                                .settingsDesc()
+                        }
                     }
 
                     if notchHeightMode.wrappedValue == .custom {
                         HStack {
                             Text(l10n["custom_notch_height"])
+                                .settingsTitle()
                             Spacer()
                             Text("\(Int(customNotchHeight.rounded()))pt")
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.primary)
                                 .monospacedDigit()
                         }
                         Slider(value: $customNotchHeight, in: 15...60, step: 1)
                     }
                 }
-            }
+            } header: { Text(l10n["panel"]).foregroundStyle(settingsDescColor) }
 
-            Section(l10n["content"]) {
-                Picker(l10n["content_font_size"], selection: $contentFontSize) {
+            Section {
+                Picker(selection: $contentFontSize) {
                     Text("10pt").tag(10)
-                    Text(l10n["11pt_default"]).tag(11)
-                    Text("12pt").tag(12)
+                    Text("11pt").tag(11)
+                    Text(l10n["12pt_default"]).tag(12)
                     Text("13pt").tag(13)
+                } label: {
+                    Text(l10n["content_font_size"]).settingsTitle()
                 }
-                Picker(l10n["ai_reply_lines"], selection: $aiMessageLines) {
+                Picker(selection: $aiMessageLines) {
                     Text(l10n["1_line_default"]).tag(1)
                     Text(l10n["2_lines"]).tag(2)
                     Text(l10n["3_lines"]).tag(3)
                     Text(l10n["5_lines"]).tag(5)
                     Text(l10n["unlimited"]).tag(0)
+                } label: {
+                    Text(l10n["ai_reply_lines"]).settingsTitle()
                 }
-                Toggle(l10n["show_agent_details"], isOn: $showAgentDetails)
-                Toggle(l10n["show_tool_status"], isOn: $showToolStatus)
-            }
+                Toggle(isOn: $showAgentDetails) { Text(l10n["show_agent_details"]).settingsTitle() }
+                Toggle(isOn: $showToolStatus) { Text(l10n["show_tool_status"]).settingsTitle() }
+            } header: { Text(l10n["content"]).foregroundStyle(settingsDescColor) }
+
+            Section {
+                Button("Open Mascot Lab…") {
+                    MascotLabWindowController.shared.show()
+                }
+            } header: { Text("Mascot").foregroundStyle(settingsDescColor) }
         }
         .formStyle(.grouped)
+        .font(.system(size: 14))
     }
 }
 
@@ -788,7 +861,7 @@ private struct AppearancePreview: View {
     let showDetails: Bool
 
     private var fs: CGFloat { CGFloat(fontSize) }
-    private let green = Color(red: 0.3, green: 0.85, blue: 0.4)
+    private let userColor = Color(hex: "#A7A7A7")
     private let aiColor = Color(red: 0.85, green: 0.47, blue: 0.34)
 
     var body: some View {
@@ -811,7 +884,7 @@ private struct AppearancePreview: View {
                 HStack(spacing: 6) {
                     Text("my-project")
                         .font(.system(size: fs + 2, weight: .bold, design: .monospaced))
-                        .foregroundStyle(green)
+                        .foregroundStyle(.white)
                     Spacer()
                     Text("3m")
                         .font(.system(size: max(9, fs - 1.5), weight: .medium, design: .monospaced))
@@ -825,18 +898,18 @@ private struct AppearancePreview: View {
                 VStack(alignment: .leading, spacing: 3) {
                     // User prompt
                     HStack(alignment: .top, spacing: 4) {
-                        Text(">")
-                            .font(.system(size: fs, weight: .bold, design: .monospaced))
-                            .foregroundStyle(green)
-                        Text("Fix the login bug")
+                        Text("You")
                             .font(.system(size: fs, weight: .medium, design: .monospaced))
-                            .foregroundStyle(.white.opacity(0.9))
+                            .foregroundStyle(userColor)
+                        Text("Fix the login bug")
+                            .font(.system(size: fs, weight: .regular, design: .monospaced))
+                            .foregroundStyle(userColor)
                             .lineLimit(1)
                     }
                     // AI reply
                     HStack(alignment: .top, spacing: 4) {
-                        Text("$")
-                            .font(.system(size: fs, weight: .bold, design: .monospaced))
+                        Text("AI")
+                            .font(.system(size: fs, weight: .medium, design: .monospaced))
                             .foregroundStyle(aiColor)
                         Text("I've analyzed the codebase and found the issue in the authentication module. The token validation was skipping the expiry check when refreshing sessions.")
                             .font(.system(size: fs, design: .monospaced))
@@ -846,8 +919,8 @@ private struct AppearancePreview: View {
                     }
                     // Working indicator
                     HStack(spacing: 4) {
-                        Text("$")
-                            .font(.system(size: fs, weight: .bold, design: .monospaced))
+                        Text("AI")
+                            .font(.system(size: fs, weight: .medium, design: .monospaced))
                             .foregroundStyle(aiColor)
                         Text("Edit src/auth.ts")
                             .font(.system(size: fs, design: .monospaced))
@@ -861,7 +934,7 @@ private struct AppearancePreview: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color(white: 0.05))
         )
         .animation(.easeInOut(duration: 0.25), value: fontSize)
@@ -901,20 +974,23 @@ private struct MascotsPage: View {
     var body: some View {
         Form {
             Section {
-                Picker(l10n["preview_status"], selection: $previewStatus) {
+                Picker(selection: $previewStatus) {
                     Text(l10n["processing"]).tag(AgentStatus.processing)
                     Text(l10n["idle"]).tag(AgentStatus.idle)
                     Text(l10n["waiting_approval"]).tag(AgentStatus.waitingApproval)
+                } label: {
+                    Text(l10n["preview_status"]).settingsTitle()
                 }
                 .pickerStyle(.segmented)
 
                 HStack {
                     Text(l10n["mascot_speed"])
+                        .settingsTitle()
                     Spacer()
                     Text(mascotSpeed == 0
                          ? l10n["speed_off"]
                          : String(format: "%.1f×", Double(mascotSpeed) / 100.0))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.primary)
                         .monospacedDigit()
                 }
                 Slider(value: Binding(
@@ -936,6 +1012,7 @@ private struct MascotsPage: View {
             }
         }
         .formStyle(.grouped)
+        .font(.system(size: 14))
     }
 }
 
@@ -955,7 +1032,7 @@ private struct MascotRow: View {
                 MascotView(source: source, status: status, size: 40)
             }
 
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 6) {
                     Text(name)
                         .font(.system(size: 14, weight: .bold, design: .monospaced))
@@ -966,8 +1043,7 @@ private struct MascotRow: View {
                     }
                 }
                 Text(desc)
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+                    .settingsDesc()
             }
 
             Spacer()
@@ -992,13 +1068,13 @@ private struct SoundPage: View {
     var body: some View {
         Form {
             Section {
-                Toggle(l10n["enable_sound"], isOn: $soundEnabled)
+                Toggle(isOn: $soundEnabled) { Text(l10n["enable_sound"]).settingsTitle() }
                 if soundEnabled {
                     HStack(spacing: 8) {
                         Text(l10n["volume"])
+                            .settingsTitle()
                         Image(systemName: "speaker.fill")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.secondary)
+                            .settingsDesc()
                         Slider(
                             value: Binding(
                                 get: { Double(soundVolume) },
@@ -1008,34 +1084,34 @@ private struct SoundPage: View {
                             step: 5
                         )
                         Image(systemName: "speaker.wave.3.fill")
-                            .font(.system(size: 10))
-                            .foregroundStyle(.secondary)
+                            .settingsDesc()
                         Text("\(soundVolume)%")
                             .font(.system(size: 12, design: .monospaced))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.primary)
                             .frame(width: 36, alignment: .trailing)
                     }
                 }
             }
 
             if soundEnabled {
-                Section(l10n["sessions"]) {
+                Section {
                     SoundEventRow(title: l10n["session_start"], subtitle: l10n["new_claude_session"], soundName: "8bit_start", isOn: $soundSessionStart)
                     SoundEventRow(title: l10n["task_complete"], subtitle: l10n["ai_completed_reply"], soundName: "8bit_complete", isOn: $soundTaskComplete)
                     SoundEventRow(title: l10n["task_error"], subtitle: l10n["tool_or_api_error"], soundName: "8bit_error", isOn: $soundTaskError)
-                }
+                } header: { Text(l10n["sessions"]).foregroundStyle(settingsDescColor) }
 
-                Section(l10n["interaction"]) {
+                Section {
                     SoundEventRow(title: l10n["approval_needed"], subtitle: l10n["waiting_approval_desc"], soundName: "8bit_approval", isOn: $soundApprovalNeeded)
                     SoundEventRow(title: l10n["task_confirmation"], subtitle: l10n["you_sent_message"], soundName: "8bit_submit", isOn: $soundPromptSubmit)
-                }
+                } header: { Text(l10n["interaction"]).foregroundStyle(settingsDescColor) }
 
-                Section(l10n["system_section"]) {
+                Section {
                     SoundEventRow(title: l10n["boot_sound"], subtitle: l10n["boot_sound_desc"], soundName: "8bit_boot", isOn: $soundBoot)
-                }
+                } header: { Text(l10n["system_section"]).foregroundStyle(settingsDescColor) }
             }
         }
         .formStyle(.grouped)
+        .font(.system(size: 14))
     }
 }
 
@@ -1049,18 +1125,17 @@ private struct SoundEventRow: View {
 
     var body: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(title)
+                    .settingsTitle()
                 if customPath.isEmpty {
                     if let subtitle {
                         Text(subtitle)
-                            .font(.system(size: 11))
-                            .foregroundStyle(.tertiary)
+                            .settingsDesc()
                     }
                 } else {
                     Text(l10n["custom_sound_set"].replacingOccurrences(of: "%@", with: URL(fileURLWithPath: customPath).lastPathComponent))
-                        .font(.system(size: 11))
-                        .foregroundStyle(.orange)
+                        .settingsDesc()
                 }
             }
             Spacer(minLength: 16)
@@ -1081,7 +1156,7 @@ private struct SoundEventRow: View {
             } label: {
                 Image(systemName: customPath.isEmpty ? "waveform" : "waveform.circle.fill")
                     .font(.system(size: 14))
-                    .foregroundStyle(customPath.isEmpty ? .secondary : Color.orange)
+                    .foregroundStyle(customPath.isEmpty ? Color.primary : Color.orange)
             }
             .menuStyle(.borderlessButton)
             .frame(width: 24)
@@ -1094,7 +1169,7 @@ private struct SoundEventRow: View {
             } label: {
                 Image(systemName: "play.circle.fill")
                     .font(.system(size: 22))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.primary)
             }
             .buttonStyle(.plain)
             Toggle("", isOn: $isOn)
@@ -1137,20 +1212,18 @@ private struct AboutPage: View {
                 AppLogoView(size: 100)
 
                 VStack(spacing: 6) {
-                    Text("CodeIsland")
+                    Text("Notch Cove")
                         .font(.system(size: 26, weight: .bold))
                     Text("Version \(AppVersion.current)")
                         .font(.system(size: 13))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.primary)
                 }
 
                 VStack(spacing: 4) {
                     Text(l10n["about_desc1"])
-                        .font(.system(size: 12))
-                        .foregroundStyle(.tertiary)
+                        .settingsDesc()
                     Text(l10n["about_desc2"])
-                        .font(.system(size: 12))
-                        .foregroundStyle(.tertiary)
+                        .settingsDesc()
                 }
 
                 HStack(spacing: 12) {
@@ -1166,11 +1239,11 @@ private struct AboutPage: View {
                 } label: {
                     HStack(spacing: 5) {
                         Image(systemName: "ladybug")
-                            .font(.system(size: 11))
+                            .font(.system(size: 12))
                         Text(l10n["export_diagnostics"])
                             .font(.system(size: 12, weight: .medium))
                     }
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.primary)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 7)
                     .background(
@@ -1201,8 +1274,7 @@ private struct AboutPage: View {
             HStack(spacing: 6) {
                 ProgressView().controlSize(.small)
                 Text(l10n["check_for_updates"])
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+                    .settingsDesc()
             }
 
         case .upToDate:
@@ -1214,8 +1286,7 @@ private struct AboutPage: View {
                         .foregroundStyle(.green)
                         .font(.system(size: 13))
                     Text(String(format: l10n["no_update_body"], AppVersion.current))
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
+                        .settingsDesc()
                 }
             }
             .buttonStyle(.plain)
@@ -1230,16 +1301,15 @@ private struct AboutPage: View {
                         .foregroundStyle(.blue)
                         .font(.system(size: 13))
                     Text(String(format: l10n["update_available_body"], version, AppVersion.current))
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
+                        .settingsDesc()
                         .multilineTextAlignment(.center)
                 }
 
                 if updater.isHomebrewInstall {
                     HStack(spacing: 8) {
                         Text(l10n["update_homebrew_command"])
-                            .font(.system(size: 11, design: .monospaced))
-                            .foregroundStyle(.secondary)
+                            .font(.system(size: 12, design: .monospaced))
+                            .foregroundStyle(.primary)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
                             .background(RoundedRectangle(cornerRadius: 6).fill(Color(nsColor: .controlBackgroundColor)))
@@ -1258,21 +1328,19 @@ private struct AboutPage: View {
         case let .downloading(progress):
             VStack(spacing: 6) {
                 Text(l10n["update_downloading"])
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+                    .settingsDesc()
                 ProgressView(value: progress)
                     .frame(width: 200)
                 Text("\(Int(progress * 100))%")
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(.tertiary)
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundStyle(.primary)
             }
 
         case .installing:
             HStack(spacing: 6) {
                 ProgressView().controlSize(.small)
                 Text(l10n["update_installing"])
-                    .font(.system(size: 12))
-                    .foregroundStyle(.secondary)
+                    .settingsDesc()
             }
 
         case let .failed(message):
@@ -1282,8 +1350,7 @@ private struct AboutPage: View {
                         .foregroundStyle(.orange)
                         .font(.system(size: 13))
                     Text(String(format: l10n["update_failed_body"], message))
-                        .font(.system(size: 12))
-                        .foregroundStyle(.secondary)
+                        .settingsDesc()
                         .lineLimit(2)
                 }
                 aboutButton(l10n["update_retry"], icon: "arrow.clockwise") {
@@ -1297,11 +1364,11 @@ private struct AboutPage: View {
         Button(action: action) {
             HStack(spacing: 5) {
                 Image(systemName: icon)
-                    .font(.system(size: 11))
+                    .font(.system(size: 12))
                 Text(title)
                     .font(.system(size: 12, weight: .medium))
             }
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.primary)
             .padding(.horizontal, 14)
             .padding(.vertical, 7)
             .background(
@@ -1421,9 +1488,11 @@ private struct BehaviorToggleRow: View {
         Toggle(isOn: $isOn) {
             HStack(spacing: 12) {
                 NotchMiniAnim(animation: animation)
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(title)
+                        .settingsTitle()
                     Text(desc)
+                        .settingsDesc()
                 }
             }
         }
@@ -1713,31 +1782,14 @@ private struct NotchMiniAnim: View {
 struct AppLogoView: View {
     var size: CGFloat = 100
     var showBackground: Bool = true
-    private let orange = Color(red: 0.96, green: 0.65, blue: 0.14)
 
     var body: some View {
-        Canvas { ctx, sz in
-            // macOS icon standard: ~10% padding on each side
-            let inset = sz.width * 0.1
-            let contentRect = CGRect(x: inset, y: inset, width: sz.width - inset * 2, height: sz.height - inset * 2)
-            let px = contentRect.width / 16
-            if showBackground {
-                let bgPath = Path(roundedRect: contentRect, cornerRadius: contentRect.width * 0.22, style: .continuous)
-                ctx.fill(bgPath, with: .color(.white))
-            }
-            // Notch pill
-            let pillColor = showBackground ? Color(white: 0.1) : Color(white: 0.5)
-            let pillRect = CGRect(x: contentRect.minX + px * 3, y: contentRect.minY + px * 6, width: px * 10, height: px * 4)
-            ctx.fill(Path(roundedRect: pillRect, cornerRadius: px * 2, style: .continuous), with: .color(pillColor))
-            // Eyes
-            ctx.fill(Path(CGRect(x: contentRect.minX + px * 5, y: contentRect.minY + px * 7, width: px * 2, height: px * 2)), with: .color(orange))
-            ctx.fill(Path(CGRect(x: contentRect.minX + px * 9, y: contentRect.minY + px * 7, width: px * 2, height: px * 2)), with: .color(orange))
-            // Pupils
-            ctx.fill(Path(CGRect(x: contentRect.minX + px * 6, y: contentRect.minY + px * 7, width: px, height: px)), with: .color(.white))
-            ctx.fill(Path(CGRect(x: contentRect.minX + px * 10, y: contentRect.minY + px * 7, width: px, height: px)), with: .color(.white))
-        }
-        .frame(width: size, height: size)
-        .shadow(color: .black.opacity(showBackground ? 0.15 : 0), radius: size * 0.12, y: size * 0.04)
+        Image(showBackground ? "AboutLogo" : "NotchLogo")
+            .resizable()
+            .interpolation(.high)
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .shadow(color: .black.opacity(showBackground ? 0.15 : 0), radius: size * 0.12, y: size * 0.04)
     }
 }
 
@@ -1764,6 +1816,7 @@ private struct ShortcutsPage: View {
             }
         }
         .formStyle(.grouped)
+        .font(.system(size: 14))
         .onDisappear { stopRecording() }
     }
 
@@ -1820,26 +1873,26 @@ private struct ShortcutRow: View {
 
     var body: some View {
         HStack {
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(l10n["shortcut_\(action.rawValue)"])
+                    .settingsTitle()
                 Text(l10n["shortcut_\(action.rawValue)_desc"])
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .settingsDesc()
                 if let conflict {
                     HStack(spacing: 4) {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.caption2)
+                            .font(.system(size: 12))
+                            .foregroundStyle(.orange)
                         Text("\(l10n["shortcut_conflict"]) \(l10n["shortcut_\(conflict.rawValue)"])")
-                            .font(.caption)
+                            .settingsDesc()
                     }
-                    .foregroundStyle(.orange)
                 }
             }
             Spacer()
             if isRecording {
                 Text(l10n["shortcut_recording"])
                     .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(.primary)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
                     .background(RoundedRectangle(cornerRadius: 6).stroke(.orange, lineWidth: 1))
@@ -1854,7 +1907,7 @@ private struct ShortcutRow: View {
 
                     Button(action: onClear) {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.primary)
                             .font(.system(size: 14))
                     }
                     .buttonStyle(.plain)
@@ -1862,7 +1915,7 @@ private struct ShortcutRow: View {
             } else {
                 Text(l10n["shortcut_none"])
                     .font(.system(size: 12, design: .rounded))
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.primary)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
                     .background(RoundedRectangle(cornerRadius: 6).strokeBorder(.quaternary))

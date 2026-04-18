@@ -1,5 +1,5 @@
-My Island
-Copyright (c) 2026 [你的名字或 handle]
+NotchCove
+Copyright (c) 2026 fantasynovel
 
 This product is a modified version of software originally developed by
 others. This NOTICE file lists all third-party software incorporated or
@@ -23,8 +23,8 @@ Upstream Inspiration: claude-island
 ================================================================================
 
 CodeIsland acknowledges inspiration from claude-island, licensed under the
-Apache License 2.0. While no code is directly copied from claude-island in
-this product (as of [填日期]), we acknowledge the original idea:
+Apache License 2.0. No code is directly copied from claude-island in this
+product, but we acknowledge the original concept:
 
   claude-island
   Copyright (c) 2025 farouqaldori
@@ -34,50 +34,37 @@ this product (as of [填日期]), we acknowledge the original idea:
 The full text of Apache License 2.0 is available at:
   https://www.apache.org/licenses/LICENSE-2.0
 
-[以下段落:未來真的 copy 了 Apache 2.0 程式碼時再填]
-
-[如果有從 claude-island 直接複製程式碼,請列出:
-Portions of the following files are derived from claude-island
-and retain the Apache License 2.0:
-  - Sources/X/Y.swift
-  - Sources/X/Z.swift
-]
-
 ================================================================================
 Third-Party Swift Packages
 ================================================================================
 
-This product uses the following open-source Swift packages. Their licenses
-can be found in the Swift Package Manager resolver output
-(Package.resolved) and in their respective repositories.
+This product currently has no external Swift package dependencies beyond the
+Swift and Foundation standard libraries that ship with macOS and Xcode.
 
-[實際使用的套件會在這裡列,等 Package.swift 加了依賴再填]
-
-Example format:
-  - swift-argument-parser
-    Copyright (c) Apple Inc.
-    Apache License 2.0
-    https://github.com/apple/swift-argument-parser
+If dependencies are added later, they will be listed here along with the
+Package.resolved manifest.
 
 ================================================================================
 Fonts, Icons, Sounds
 ================================================================================
 
-[如果使用任何第三方素材,例如 icon、音效、字型,在此列出]
-
-Example:
   - SF Symbols: Provided by Apple Inc., free for use in applications on
     Apple platforms.
+  - SF Pro / SF Mono: System fonts provided by Apple Inc.
+  - Pixel mascot artwork and 8-bit sound effects: bundled resources under
+    Sources/CodeIsland/Resources/ — see individual attributions in the
+    resource folders where applicable.
 
 ================================================================================
 Trademarks
 ================================================================================
 
 Claude is a trademark of Anthropic, PBC.
-macOS, iTerm2, Ghostty, and other terminal application names referenced
-herein are trademarks or registered trademarks of their respective owners.
+macOS, iTerm2, Ghostty, Terminal, VS Code, Cursor, and other terminal or IDE
+application names referenced herein are trademarks or registered trademarks
+of their respective owners.
 
 This product is not affiliated with, sponsored by, or endorsed by Anthropic
-or any of the terminal application vendors mentioned.
+or any of the terminal/IDE vendors mentioned.
 
 ================================================================================

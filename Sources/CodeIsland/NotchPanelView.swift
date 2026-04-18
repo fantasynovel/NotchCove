@@ -14,8 +14,13 @@ struct NotchPanelView: View {
     @AppStorage(SettingsKey.hideWhenNoSession) private var hideWhenNoSession = SettingsDefaults.hideWhenNoSession
     @AppStorage(SettingsKey.showToolStatus) private var showToolStatus = SettingsDefaults.showToolStatus
     @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
+    @AppStorage(SettingsKey.notchLayoutMode) private var notchLayoutModeRaw = SettingsDefaults.notchLayoutMode
     @AppStorage(SettingsKey.hapticOnHover) private var hapticOnHover = SettingsDefaults.hapticOnHover
     @AppStorage(SettingsKey.hapticIntensity) private var hapticIntensity = SettingsDefaults.hapticIntensity
+
+    private var isCompactLayout: Bool {
+        NotchLayoutMode(rawValue: notchLayoutModeRaw) == .compact
+    }
 
     /// Delayed hover: prevents accidental expansion when mouse passes through
     @State private var hoverTimer: Timer?
@@ -46,20 +51,26 @@ struct NotchPanelView: View {
     /// Minimum wing width needed to display compact bar content
     private var compactWingWidth: CGFloat { mascotSize + 14 }
 
-    /// Effective notch width — applies user scale on non-notch screens (#56).
+    /// Effective notch width.
+    /// - Extended mode: slider 100% == real physical notch width.
+    /// - Compact mode: slider 100% == 1.4 × physical notch width (more room for mascot + status).
     private var effectiveNotchW: CGFloat {
-        guard !hasNotch else { return notchW }
-        let scale = CGFloat(max(collapsedWidthScale, 50)) / 100.0
-        return notchW * scale
+        let scale = CGFloat(max(collapsedWidthScale, 100)) / 100.0
+        let modeMultiplier: CGFloat = isCompactLayout ? 1.4 : 1.0
+        return notchW * scale * modeMultiplier
     }
 
     /// Total panel width — adapts based on state and screen geometry
     private var panelWidth: CGFloat {
         let nw = effectiveNotchW
-        let maxWidth = min(620, screenWidth - 40)
+        let maxWidth = min(600, screenWidth - 40)
+        if shouldShowExpanded { return min(max(nw + 200, 550), maxWidth) }
+        if isCompactLayout {
+            // Claude Island style — closed content stays inside the notch profile.
+            return nw
+        }
         if showIdleIndicator { return idleHovered ? nw + compactWingWidth * 2 + 80 : nw + compactWingWidth * 2 }
-        if !isActive { return hasNotch ? notchW - 20 : nw }
-        if shouldShowExpanded { return min(max(nw + 200, 580), maxWidth) }
+        if !isActive { return nw }
         let wing = compactWingWidth
         let extra: CGFloat = appState.status == .idle ? 0 : 20
         // Reserve space for tool status — proportional to screen width
@@ -72,19 +83,24 @@ struct NotchPanelView: View {
             VStack(spacing: 0) {
                 if showBar {
                     // Active: compact bar — wider version when expanded
-                    HStack(spacing: 0) {
-                        CompactLeftWing(appState: appState, expanded: shouldShowExpanded, mascotSize: mascotSize, hasNotch: hasNotch, showToolStatus: showToolStatus)
-                        if hasNotch && !shouldShowExpanded {
-                            Spacer(minLength: notchW)
-                        } else if !shouldShowExpanded && showToolStatus {
-                            CompactToolStatus(appState: appState)
-                            Spacer(minLength: 0)
-                        } else {
-                            Spacer(minLength: 0)
+                    if isCompactLayout && !shouldShowExpanded {
+                        CompactNotchContent(appState: appState, mascotSize: mascotSize, notchHeight: notchHeight, notchW: effectiveNotchW)
+                            .frame(height: notchHeight)
+                    } else {
+                        HStack(spacing: 0) {
+                            CompactLeftWing(appState: appState, expanded: shouldShowExpanded, mascotSize: mascotSize, hasNotch: hasNotch, showToolStatus: showToolStatus)
+                            if hasNotch && !shouldShowExpanded {
+                                Spacer(minLength: notchW)
+                            } else if !shouldShowExpanded && showToolStatus {
+                                CompactToolStatus(appState: appState)
+                                Spacer(minLength: 0)
+                            } else {
+                                Spacer(minLength: 0)
+                            }
+                            CompactRightWing(appState: appState, expanded: shouldShowExpanded, hasNotch: hasNotch)
                         }
-                        CompactRightWing(appState: appState, expanded: shouldShowExpanded, hasNotch: hasNotch)
+                        .frame(height: notchHeight)
                     }
-                    .frame(height: notchHeight)
                 } else if showIdleIndicator {
                     IdleIndicatorBar(
                         mascotSize: mascotSize,
@@ -110,11 +126,13 @@ struct NotchPanelView: View {
                     switch appState.surface {
                     case .approvalCard:
                         if let pending = appState.pendingPermission {
+                            let pendingSource = appState.sessions[pending.event.sessionId ?? ""]?.source ?? appState.primarySource
                             ApprovalBar(
                                 tool: pending.event.toolName ?? "Unknown",
                                 toolInput: pending.event.toolInput,
                                 queuePosition: 1,
                                 queueTotal: appState.permissionQueue.count,
+                                source: pendingSource,
                                 onAllow: { appState.approvePermission(always: false) },
                                 onAlwaysAllow: { appState.approvePermission(always: true) },
                                 onDeny: { appState.denyPermission() },
@@ -302,6 +320,51 @@ struct NotchPanelView: View {
 
 // MARK: - Compact Wings (notch-level, 32px height)
 
+/// Claude Island style: everything stays within the physical notch bounds.
+/// Mascot on the left, subtle status indicator on the right.
+private struct CompactNotchContent: View {
+    var appState: AppState
+    let mascotSize: CGFloat
+    let notchHeight: CGFloat
+    let notchW: CGFloat
+
+    private var displaySession: SessionSnapshot? {
+        let sid = appState.rotatingSessionId ?? appState.activeSessionId ?? appState.sessions.keys.sorted().first
+        guard let sid else { return nil }
+        return appState.sessions[sid]
+    }
+    private var displaySource: String { displaySession?.source ?? appState.primarySource }
+    private var displayStatus: AgentStatus { displaySession?.status ?? .idle }
+
+    private var compactMascotSize: CGFloat {
+        min(mascotSize, notchHeight - 8)
+    }
+
+    var body: some View {
+        HStack(spacing: 4) {
+            MascotView(source: displaySource, status: displayStatus, size: compactMascotSize)
+                .id(displaySource)
+                .transition(.opacity)
+                .animation(.easeInOut(duration: 0.3), value: displaySource)
+
+            Spacer(minLength: 0)
+
+            if appState.status == .waitingApproval || appState.status == .waitingQuestion {
+                Image(systemName: "bell.fill")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(Color(red: 1.0, green: 0.7, blue: 0.28))
+                    .symbolEffect(.pulse, options: .repeating)
+            } else if appState.status == .running || appState.status == .processing {
+                Circle()
+                    .fill(Color(red: 0.3, green: 0.85, blue: 0.4))
+                    .frame(width: 5, height: 5)
+            }
+        }
+        .padding(.horizontal, 8)
+        .frame(width: notchW)
+    }
+}
+
 /// Left side: pixel character + status info
 private struct CompactLeftWing: View {
     var appState: AppState
@@ -335,20 +398,20 @@ private struct CompactLeftWing: View {
                             } label: {
                                 PixelText(
                                     text: label,
-                                    color: selected ? Color(red: 0.3, green: 0.85, blue: 0.4) : .white.opacity(0.3),
+                                    color: selected ? Color(hex: "#118CFF") : .white.opacity(0.3),
                                     pixelSize: 1.3
                                 )
                                 .padding(.horizontal, 5)
                                 .padding(.vertical, 4)
                                 .background(
-                                    Rectangle().fill(selected ? .white.opacity(0.1) : .clear)
+                                    RoundedRectangle(cornerRadius: 3).fill(selected ? .white.opacity(0.1) : .clear)
                                 )
                             }
                             .buttonStyle(.plain)
                         }
                     }
-                    .background(Rectangle().fill(.white.opacity(0.05)))
-                    .overlay(Rectangle().stroke(.white.opacity(0.1), lineWidth: 1))
+                    .background(RoundedRectangle(cornerRadius: 4).fill(.white.opacity(0.05)))
+                    .overlay(RoundedRectangle(cornerRadius: 4).stroke(.white.opacity(0.1), lineWidth: 1))
                 }
             } else {
                 MascotView(source: displaySource, status: displayStatus, size: mascotSize)
@@ -827,10 +890,19 @@ private struct ApprovalBar: View {
     let toolInput: [String: Any]?
     let queuePosition: Int
     let queueTotal: Int
+    let source: String
     let onAllow: () -> Void
     let onAlwaysAllow: () -> Void
     let onDeny: () -> Void
     let onDismiss: () -> Void
+
+    private var alwaysBg: Color {
+        switch source {
+        case "claude": return Color(hex: "#E16503")
+        case "codex": return Color(hex: "#6E59F8")
+        default: return Color(hex: "#3B7ACF")
+        }
+    }
 
     private var fileName: String? {
         guard let fp = toolInput?["file_path"] as? String else { return nil }
@@ -889,10 +961,10 @@ private struct ApprovalBar: View {
 
             // Pixel-style buttons
             HStack(spacing: 6) {
-                PixelButton(label: L10n.shared["deny"], fg: .white.opacity(0.95), bg: Color(red: 0.45, green: 0.12, blue: 0.12), border: Color(red: 0.7, green: 0.25, blue: 0.25), action: onDeny)
-                PixelButton(label: L10n.shared["dismiss"], fg: .white.opacity(0.95), bg: Color(red: 0.25, green: 0.25, blue: 0.25), border: Color.white.opacity(0.28), action: onDismiss)
-                PixelButton(label: L10n.shared["allow_once"], fg: .white.opacity(0.95), bg: Color(red: 0.16, green: 0.38, blue: 0.18), border: Color(red: 0.28, green: 0.62, blue: 0.32), action: onAllow)
-                PixelButton(label: L10n.shared["always"], fg: .white.opacity(0.95), bg: Color(red: 0.14, green: 0.28, blue: 0.52), border: Color(red: 0.28, green: 0.48, blue: 0.82), action: onAlwaysAllow)
+                PixelButton(label: L10n.shared["deny"], fg: .white.opacity(0.95), bg: Color(hex: "#BC011C"), cornerRadius: 8, action: onDeny)
+                PixelButton(label: L10n.shared["dismiss"], fg: .white.opacity(0.95), bg: Color(hex: "#313030"), cornerRadius: 8, action: onDismiss)
+                PixelButton(label: L10n.shared["always"], fg: .white.opacity(0.95), bg: alwaysBg, cornerRadius: 8, action: onAlwaysAllow)
+                PixelButton(label: L10n.shared["allow_once"], fg: Color(hex: "#1B2839"), bg: Color(hex: "#FFFFFF"), cornerRadius: 8, action: onAllow)
             }
             .padding(.horizontal, 14)
         }
@@ -1396,7 +1468,8 @@ private struct PixelButton: View {
     let label: String
     let fg: Color
     let bg: Color
-    let border: Color
+    var border: Color? = nil
+    var cornerRadius: CGFloat = 4
     let action: () -> Void
     @State private var hovering = false
 
@@ -1408,12 +1481,16 @@ private struct PixelButton: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 7)
                 .background(
-                    RoundedRectangle(cornerRadius: 4)
+                    RoundedRectangle(cornerRadius: cornerRadius)
                         .fill(hovering ? bg.opacity(1.5) : bg)
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 4)
-                        .strokeBorder(hovering ? border : border.opacity(0.4), lineWidth: 1)
+                    Group {
+                        if let border {
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .strokeBorder(hovering ? border : border.opacity(0.4), lineWidth: 1)
+                        }
+                    }
                 )
         }
         .buttonStyle(.plain)
@@ -1624,29 +1701,6 @@ private struct SessionIdentityLine: View {
                 color: projectColor
             )
             .layoutPriority(2)
-
-            if let sessionLabel = session.sessionLabel {
-                Text("#\(sessionLabel)")
-                    .font(.system(size: sessionFontSize, weight: .medium, design: .monospaced))
-                    .foregroundStyle(sessionColor)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .layoutPriority(1)
-
-                Text("·")
-                    .font(.system(size: sessionFontSize, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(dividerColor)
-
-                Text("#\(shortSessionId(displaySessionId))")
-                    .font(.system(size: sessionFontSize, weight: .medium, design: .monospaced))
-                    .foregroundStyle(sessionColor.opacity(0.6))
-                    .fixedSize()
-            } else {
-                Text("#\(shortSessionId(displaySessionId))")
-                    .font(.system(size: sessionFontSize, weight: .medium, design: .monospaced))
-                    .foregroundStyle(sessionColor.opacity(0.6))
-                    .fixedSize()
-            }
         }
     }
 }
@@ -1781,9 +1835,17 @@ private struct SessionCard: View {
             return Color(red: 1.0, green: 0.45, blue: 0.35)
         }
         switch session.status {
-        case .processing, .running:              return Color(red: 0.3, green: 0.85, blue: 0.4)
+        case .processing, .running:              return Color(hex: "#FFFFFF")
         case .waitingApproval, .waitingQuestion:  return Color(red: 1.0, green: 0.6, blue: 0.2)
         case .idle:                               return .white
+        }
+    }
+
+    private var inlineAlwaysBg: Color {
+        switch session.source {
+        case "claude": return Color(hex: "#E16503")
+        case "codex": return Color(hex: "#6E59F8")
+        default: return Color(hex: "#3B7ACF")
         }
     }
 
@@ -1794,7 +1856,7 @@ private struct SessionCard: View {
         enabled: Bool,
         action: @escaping () -> Void
     ) -> some View {
-        Button(action: action) {
+        Button(action: { if enabled { action() } }) {
             Text(label)
                 .font(.system(size: max(10, fontSize - 1), weight: .semibold, design: .monospaced))
                 .foregroundStyle(fg)
@@ -1802,15 +1864,12 @@ private struct SessionCard: View {
                 .padding(.vertical, 5)
                 .background(
                     RoundedRectangle(cornerRadius: 5)
-                        .fill(bg.opacity(enabled ? 1 : 0.35))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 5)
-                        .strokeBorder(.white.opacity(enabled ? 0.25 : 0.12), lineWidth: 1)
+                        .fill(bg)
                 )
         }
         .buttonStyle(.plain)
-        .disabled(!enabled)
+        .opacity(enabled ? 1 : 0.55)
+        .allowsHitTesting(enabled)
         .opacity(enabled ? 1 : 0.55)
     }
 
@@ -1878,34 +1937,44 @@ private struct SessionCard: View {
                             .foregroundStyle(.white.opacity(0.65))
                             .lineLimit(1)
                             .truncationMode(.tail)
+                        if !isActiveApproval {
+                            Text(L10n.shared["status_waiting"])
+                                .font(.system(size: max(9, fontSize - 2), weight: .semibold, design: .monospaced))
+                                .foregroundStyle(Color(hex: "#F3A953"))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 3).fill(Color(hex: "#F3A953").opacity(0.15))
+                                )
+                        }
                         Spacer(minLength: 8)
                         inlineActionButton(
                             showApprovalDetails ? L10n.shared["approval_details_collapse"] : L10n.shared["approval_details_expand"],
                             fg: .white,
-                            bg: Color.white.opacity(0.10),
+                            bg: Color(hex: "#313030"),
                             enabled: true,
                             action: { withAnimation(NotchAnimation.micro) { showApprovalDetails.toggle() } }
                         )
                         inlineActionButton(
-                            L10n.shared["allow_once"],
-                            fg: .white,
-                            bg: Color(red: 0.25, green: 0.65, blue: 0.35),
-                            enabled: isActiveApproval,
-                            action: { appState.approvePermission(always: false) }
-                        )
-                        inlineActionButton(
                             L10n.shared["always"],
                             fg: .white,
-                            bg: Color(red: 0.25, green: 0.55, blue: 0.85),
-                            enabled: isActiveApproval,
-                            action: { appState.approvePermission(always: true) }
+                            bg: inlineAlwaysBg,
+                            enabled: true,
+                            action: { appState.approvePermission(at: approvalQueueIndex ?? 0, always: true) }
+                        )
+                        inlineActionButton(
+                            L10n.shared["allow_once"],
+                            fg: Color(hex: "#1B2839"),
+                            bg: Color(hex: "#FFFFFF"),
+                            enabled: true,
+                            action: { appState.approvePermission(at: approvalQueueIndex ?? 0, always: false) }
                         )
                         inlineActionButton(
                             L10n.shared["deny"],
                             fg: .white,
-                            bg: Color(red: 0.85, green: 0.3, blue: 0.3),
-                            enabled: isActiveApproval,
-                            action: { appState.denyPermission() }
+                            bg: Color(hex: "#BC011C"),
+                            enabled: true,
+                            action: { appState.denyPermission(at: approvalQueueIndex ?? 0) }
                         )
                     }
 
@@ -1963,9 +2032,18 @@ private struct SessionCard: View {
             if !session.recentMessages.isEmpty || session.status != .idle {
                 VStack(alignment: .leading, spacing: 3) {
                     // Chat messages (detailed mode only)
-                    let visibleMessages = session.status != .idle
-                        ? Array(session.recentMessages.suffix(2))
-                        : session.recentMessages
+                    let visibleMessages: [ChatMessage] = {
+                        if session.status != .idle {
+                            return Array(session.recentMessages.suffix(2))
+                        }
+                        // Idle: show the most recent user + AI pair, preserving chronological order
+                        let recent = session.recentMessages
+                        let indices = [
+                            recent.lastIndex(where: { $0.isUser }),
+                            recent.lastIndex(where: { !$0.isUser }),
+                        ].compactMap { $0 }.sorted()
+                        return indices.map { recent[$0] }
+                    }()
                     ForEach(visibleMessages) { msg in
                         // Extracted to separate view so SwiftUI skips re-rendering
                         // when only the parent's hover state changes (#52 perf).
@@ -1980,8 +2058,8 @@ private struct SessionCard: View {
                     // Working indicator: show what AI is doing right now
                     if session.status != .idle {
                         HStack(spacing: 4) {
-                            Text("$")
-                                .font(.system(size: fontSize, weight: .bold, design: .monospaced))
+                            Text("AI")
+                                .font(.system(size: fontSize, weight: .medium, design: .monospaced))
                                 .foregroundStyle(Color(red: 0.85, green: 0.47, blue: 0.34))
                             if let tool = session.currentTool {
                                 MorphText(
@@ -2003,7 +2081,7 @@ private struct SessionCard: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 18)
                 .fill(hovering ? Color.white.opacity(0.10) : Color.white.opacity(0.05))
         )
         .padding(.horizontal, 6)
@@ -2636,19 +2714,19 @@ private struct ChatMessageRow: View, Equatable {
     var body: some View {
         if isUser {
             HStack(alignment: .top, spacing: 4) {
-                Text(">")
-                    .font(.system(size: fontSize, weight: .bold, design: .monospaced))
-                    .foregroundStyle(Color(red: 0.3, green: 0.85, blue: 0.4))
-                Text(ChatMessageTextFormatter.literalText(text))
+                Text("You")
                     .font(.system(size: fontSize, weight: .medium, design: .monospaced))
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(Color(hex: "#A7A7A7"))
+                Text(ChatMessageTextFormatter.literalText(text))
+                    .font(.system(size: fontSize, weight: .regular, design: .monospaced))
+                    .foregroundStyle(Color(hex: "#A7A7A7"))
                     .lineLimit(1)
                     .truncationMode(.tail)
             }
         } else {
             HStack(alignment: .top, spacing: 4) {
-                Text("$")
-                    .font(.system(size: fontSize, weight: .bold, design: .monospaced))
+                Text("AI")
+                    .font(.system(size: fontSize, weight: .medium, design: .monospaced))
                     .foregroundStyle(Color(red: 0.85, green: 0.47, blue: 0.34))
                 Text(ChatMessageTextFormatter.inlineMarkdown(compactText(stripDirectives(text))))
                     .font(.system(size: fontSize, design: .monospaced))
