@@ -341,14 +341,14 @@ private struct CompactLeftWing: View {
                                 .padding(.horizontal, 5)
                                 .padding(.vertical, 4)
                                 .background(
-                                    Rectangle().fill(selected ? .white.opacity(0.1) : .clear)
+                                    RoundedRectangle(cornerRadius: 3).fill(selected ? .white.opacity(0.1) : .clear)
                                 )
                             }
                             .buttonStyle(.plain)
                         }
                     }
-                    .background(Rectangle().fill(.white.opacity(0.05)))
-                    .overlay(Rectangle().stroke(.white.opacity(0.1), lineWidth: 1))
+                    .background(RoundedRectangle(cornerRadius: 4).fill(.white.opacity(0.05)))
+                    .overlay(RoundedRectangle(cornerRadius: 4).stroke(.white.opacity(0.1), lineWidth: 1))
                 }
             } else {
                 MascotView(source: displaySource, status: displayStatus, size: mascotSize)
