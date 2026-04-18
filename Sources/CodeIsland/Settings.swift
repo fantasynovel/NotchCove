@@ -81,6 +81,8 @@ enum SettingsKey {
     // Island collapsed width scale for non-notch screens (percentage: 50–150, default 100)
     static let collapsedWidthScale = "collapsedWidthScale"
 
+    // Compact-bar layout style: "extended" (default, with side wings) or "compact" (Claude Island style, stays inside notch)
+    static let notchLayoutMode = "notchLayoutMode"
 }
 
 struct SettingsDefaults {
@@ -124,6 +126,12 @@ struct SettingsDefaults {
     static let showToolStatus = true
 
     static let collapsedWidthScale = 100  // percentage; 100% == real notch width
+    static let notchLayoutMode = NotchLayoutMode.extended.rawValue
+}
+
+enum NotchLayoutMode: String, CaseIterable {
+    case extended   // default — left/right wings extend beyond the notch
+    case compact    // Claude Island style — stays within the notch
 }
 
 @MainActor
@@ -166,6 +174,7 @@ class SettingsManager {
             SettingsKey.sessionGroupingMode: SettingsDefaults.sessionGroupingMode,
             SettingsKey.showToolStatus: SettingsDefaults.showToolStatus,
             SettingsKey.collapsedWidthScale: SettingsDefaults.collapsedWidthScale,
+            SettingsKey.notchLayoutMode: SettingsDefaults.notchLayoutMode,
         ])
     }
 

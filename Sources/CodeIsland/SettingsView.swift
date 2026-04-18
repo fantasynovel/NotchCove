@@ -691,11 +691,19 @@ private struct AppearancePage: View {
     @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
     @AppStorage(SettingsKey.notchHeightMode) private var notchHeightModeRaw = SettingsDefaults.notchHeightMode
     @AppStorage(SettingsKey.customNotchHeight) private var customNotchHeight = SettingsDefaults.customNotchHeight
+    @AppStorage(SettingsKey.notchLayoutMode) private var notchLayoutModeRaw = SettingsDefaults.notchLayoutMode
 
     private var notchHeightMode: Binding<NotchHeightMode> {
         Binding(
             get: { NotchHeightMode(rawValue: notchHeightModeRaw) ?? .matchNotch },
             set: { notchHeightModeRaw = $0.rawValue }
+        )
+    }
+
+    private var notchLayoutMode: Binding<NotchLayoutMode> {
+        Binding(
+            get: { NotchLayoutMode(rawValue: notchLayoutModeRaw) ?? .extended },
+            set: { notchLayoutModeRaw = $0.rawValue }
         )
     }
 
@@ -735,6 +743,16 @@ private struct AppearancePage: View {
                     Text(l10n["collapsed_width_scale_desc"])
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    Picker(selection: notchLayoutMode) {
+                        Text(l10n["notch_layout_extended"]).tag(NotchLayoutMode.extended)
+                        Text(l10n["notch_layout_compact"]).tag(NotchLayoutMode.compact)
+                    } label: {
+                        Text(l10n["notch_layout_mode"])
+                        Text(l10n["notch_layout_mode_desc"])
+                    }
+                    .pickerStyle(.segmented)
                 }
                 VStack(alignment: .leading, spacing: 4) {
                     Picker(selection: notchHeightMode) {

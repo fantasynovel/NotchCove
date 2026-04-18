@@ -14,8 +14,13 @@ struct NotchPanelView: View {
     @AppStorage(SettingsKey.hideWhenNoSession) private var hideWhenNoSession = SettingsDefaults.hideWhenNoSession
     @AppStorage(SettingsKey.showToolStatus) private var showToolStatus = SettingsDefaults.showToolStatus
     @AppStorage(SettingsKey.collapsedWidthScale) private var collapsedWidthScale = SettingsDefaults.collapsedWidthScale
+    @AppStorage(SettingsKey.notchLayoutMode) private var notchLayoutModeRaw = SettingsDefaults.notchLayoutMode
     @AppStorage(SettingsKey.hapticOnHover) private var hapticOnHover = SettingsDefaults.hapticOnHover
     @AppStorage(SettingsKey.hapticIntensity) private var hapticIntensity = SettingsDefaults.hapticIntensity
+
+    private var isCompactLayout: Bool {
+        NotchLayoutMode(rawValue: notchLayoutModeRaw) == .compact
+    }
 
     /// Delayed hover: prevents accidental expansion when mouse passes through
     @State private var hoverTimer: Timer?
@@ -46,19 +51,26 @@ struct NotchPanelView: View {
     /// Minimum wing width needed to display compact bar content
     private var compactWingWidth: CGFloat { mascotSize + 14 }
 
-    /// Effective notch width — slider 100% == real physical notch width.
+    /// Effective notch width.
+    /// - Extended mode: slider 100% == real physical notch width.
+    /// - Compact mode: slider 100% == 1.4 × physical notch width (more room for mascot + status).
     private var effectiveNotchW: CGFloat {
         let scale = CGFloat(max(collapsedWidthScale, 50)) / 100.0
-        return notchW * scale
+        let modeMultiplier: CGFloat = isCompactLayout ? 1.4 : 1.0
+        return notchW * scale * modeMultiplier
     }
 
     /// Total panel width — adapts based on state and screen geometry
     private var panelWidth: CGFloat {
         let nw = effectiveNotchW
-        let maxWidth = min(620, screenWidth - 40)
+        let maxWidth = min(600, screenWidth - 40)
+        if shouldShowExpanded { return min(max(nw + 200, 550), maxWidth) }
+        if isCompactLayout {
+            // Claude Island style — closed content stays inside the notch profile.
+            return nw
+        }
         if showIdleIndicator { return idleHovered ? nw + compactWingWidth * 2 + 80 : nw + compactWingWidth * 2 }
         if !isActive { return nw }
-        if shouldShowExpanded { return min(max(nw + 200, 580), maxWidth) }
         let wing = compactWingWidth
         let extra: CGFloat = appState.status == .idle ? 0 : 20
         // Reserve space for tool status — proportional to screen width
@@ -71,19 +83,24 @@ struct NotchPanelView: View {
             VStack(spacing: 0) {
                 if showBar {
                     // Active: compact bar — wider version when expanded
-                    HStack(spacing: 0) {
-                        CompactLeftWing(appState: appState, expanded: shouldShowExpanded, mascotSize: mascotSize, hasNotch: hasNotch, showToolStatus: showToolStatus)
-                        if hasNotch && !shouldShowExpanded {
-                            Spacer(minLength: notchW)
-                        } else if !shouldShowExpanded && showToolStatus {
-                            CompactToolStatus(appState: appState)
-                            Spacer(minLength: 0)
-                        } else {
-                            Spacer(minLength: 0)
+                    if isCompactLayout && !shouldShowExpanded {
+                        CompactNotchContent(appState: appState, mascotSize: mascotSize, notchHeight: notchHeight, notchW: effectiveNotchW)
+                            .frame(height: notchHeight)
+                    } else {
+                        HStack(spacing: 0) {
+                            CompactLeftWing(appState: appState, expanded: shouldShowExpanded, mascotSize: mascotSize, hasNotch: hasNotch, showToolStatus: showToolStatus)
+                            if hasNotch && !shouldShowExpanded {
+                                Spacer(minLength: notchW)
+                            } else if !shouldShowExpanded && showToolStatus {
+                                CompactToolStatus(appState: appState)
+                                Spacer(minLength: 0)
+                            } else {
+                                Spacer(minLength: 0)
+                            }
+                            CompactRightWing(appState: appState, expanded: shouldShowExpanded, hasNotch: hasNotch)
                         }
-                        CompactRightWing(appState: appState, expanded: shouldShowExpanded, hasNotch: hasNotch)
+                        .frame(height: notchHeight)
                     }
-                    .frame(height: notchHeight)
                 } else if showIdleIndicator {
                     IdleIndicatorBar(
                         mascotSize: mascotSize,
@@ -302,6 +319,51 @@ struct NotchPanelView: View {
 
 
 // MARK: - Compact Wings (notch-level, 32px height)
+
+/// Claude Island style: everything stays within the physical notch bounds.
+/// Mascot on the left, subtle status indicator on the right.
+private struct CompactNotchContent: View {
+    var appState: AppState
+    let mascotSize: CGFloat
+    let notchHeight: CGFloat
+    let notchW: CGFloat
+
+    private var displaySession: SessionSnapshot? {
+        let sid = appState.rotatingSessionId ?? appState.activeSessionId ?? appState.sessions.keys.sorted().first
+        guard let sid else { return nil }
+        return appState.sessions[sid]
+    }
+    private var displaySource: String { displaySession?.source ?? appState.primarySource }
+    private var displayStatus: AgentStatus { displaySession?.status ?? .idle }
+
+    private var compactMascotSize: CGFloat {
+        min(mascotSize, notchHeight - 8)
+    }
+
+    var body: some View {
+        HStack(spacing: 4) {
+            MascotView(source: displaySource, status: displayStatus, size: compactMascotSize)
+                .id(displaySource)
+                .transition(.opacity)
+                .animation(.easeInOut(duration: 0.3), value: displaySource)
+
+            Spacer(minLength: 0)
+
+            if appState.status == .waitingApproval || appState.status == .waitingQuestion {
+                Image(systemName: "bell.fill")
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(Color(red: 1.0, green: 0.7, blue: 0.28))
+                    .symbolEffect(.pulse, options: .repeating)
+            } else if appState.status == .running || appState.status == .processing {
+                Circle()
+                    .fill(Color(red: 0.3, green: 0.85, blue: 0.4))
+                    .frame(width: 5, height: 5)
+            }
+        }
+        .padding(.horizontal, 8)
+        .frame(width: notchW)
+    }
+}
 
 /// Left side: pixel character + status info
 private struct CompactLeftWing: View {
@@ -1773,7 +1835,7 @@ private struct SessionCard: View {
             return Color(red: 1.0, green: 0.45, blue: 0.35)
         }
         switch session.status {
-        case .processing, .running:              return Color(red: 0.3, green: 0.85, blue: 0.4)
+        case .processing, .running:              return Color(hex: "#FFFFFF")
         case .waitingApproval, .waitingQuestion:  return Color(red: 1.0, green: 0.6, blue: 0.2)
         case .idle:                               return .white
         }
@@ -2010,7 +2072,7 @@ private struct SessionCard: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 18)
                 .fill(hovering ? Color.white.opacity(0.10) : Color.white.opacity(0.05))
         )
         .padding(.horizontal, 6)
@@ -2645,10 +2707,10 @@ private struct ChatMessageRow: View, Equatable {
             HStack(alignment: .top, spacing: 4) {
                 Text(">")
                     .font(.system(size: fontSize, weight: .bold, design: .monospaced))
-                    .foregroundStyle(Color(red: 0.3, green: 0.85, blue: 0.4))
+                    .foregroundStyle(Color(hex: "#4CD966"))
                 Text(ChatMessageTextFormatter.literalText(text))
                     .font(.system(size: fontSize, weight: .medium, design: .monospaced))
-                    .foregroundStyle(.white.opacity(0.9))
+                    .foregroundStyle(Color(hex: "#A7A7A7"))
                     .lineLimit(1)
                     .truncationMode(.tail)
             }
