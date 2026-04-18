@@ -7,17 +7,20 @@
 ## 📂 結構
 
 ```
-my-island/
-├── README.md                    ← 對外門面
+NotchCove/
+├── README.md                    ← 對外門面(英文)
+├── README.zh-TW.md              ← 繁體中文版 README
 ├── LICENSE                      ← MIT license(保留 wxtsky copyright)
 ├── NOTICE                       ← 法律歸屬清單
 ├── CHANGELOG.md                 ← 版本歷史
 ├── SECURITY.md                  ← 安全政策
 ├── .github/
-│   └── ISSUE_TEMPLATE/          ← GitHub issue 範本
-│       ├── bug_report.md
-│       ├── feature_request.md
-│       └── config.yml
+│   ├── ISSUE_TEMPLATE/          ← GitHub issue 範本
+│   │   ├── bug_report.md
+│   │   ├── feature_request.md
+│   │   └── config.yml
+│   └── workflows/
+│       └── release.yml          ← Release 發佈流程
 └── docs/
     ├── INDEX.md                 ← 你正在看的這份
     ├── research/                ← 逆向工程筆記(Phase 4.75)
@@ -96,7 +99,6 @@ my-island/
 - [ ] `docs/roadmap.md` — 公開 roadmap
 - [ ] `CONTRIBUTING.md` — 貢獻者指南(等有人想貢獻再寫)
 - [ ] `PRIVACY.md` — 隱私政策(iPhone 同步上線前必須有)
-- [ ] `README.zh-TW.md` — 中文 README
 - [ ] `docs/images/` — 截圖(發 v0.1.0 前要有)
 
 ---

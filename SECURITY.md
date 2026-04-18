@@ -15,45 +15,37 @@
 
 ## Reporting a Vulnerability
 
-如果你發現了 My Island 的安全漏洞,**請不要公開在 GitHub Issues 討論**。
+如果你發現了 NotchCove 的安全漏洞,**請不要公開在 GitHub Issues 討論**。
 
-改用以下方式:
+請使用 GitHub Private Security Advisory:
 
-### 方法 1:GitHub Private Security Advisory(推薦)
-
-1. 到 [Security Advisories 頁面](https://github.com/你的handle/my-island/security/advisories/new)
-2. 填表,我會私下收到通知
-
-### 方法 2:Email
-
-寄到:**[你的email,可用 security@你的域名 或個人 email]**
-
-Email 主旨請包含 `[MyIsland Security]`。
+1. 前往 [Security Advisories 頁面](https://github.com/fantasynovel/NotchCove/security/advisories/new)
+2. 填寫表單,維護者會私下收到通知
 
 ### 請在通報中包含
 
-- 漏洞描述(是哪類問題?例如 RCE、info leak、privilege escalation...)
+- 漏洞描述(是哪類問題?例如 RCE、info leak、privilege escalation…)
 - 重現步驟
 - 影響範圍(誰會受影響?)
 - 已確認受影響的版本
-- (選填)修正建議或 POC
+- (選填)修正建議或 PoC
 
 ---
 
 ## Response Timeline
 
-我個人專案沒有團隊,回應時間不會像公司那麼快。但我承諾:
+這是個人專案,回應時間不會像公司那麼快。但承諾如下:
 
 - **48 小時內**:確認收到
 - **7 天內**:初步評估(確認是否為漏洞、嚴重程度)
 - **30 天內**:如果確認是漏洞,釋出修正或緩解方案
-- 修正釋出後,會在 release notes 和 advisory 致謝(除非你要求匿名)
+- 修正釋出後,會在 release notes 與 advisory 致謝(除非你要求匿名)
 
 ---
 
-## 安全設計原則(我的承諾)
+## 安全設計原則
 
-My Island 在設計上遵守這些原則:
+NotchCove 在設計上遵守這些原則:
 
 ### Local-first
 - 預設所有資料留在本機
@@ -63,11 +55,11 @@ My Island 在設計上遵守這些原則:
 ### Unix Socket 權限
 - Socket 檔建立後強制 `chmod 0600`
 - 只有當前使用者能讀寫
-- 別的使用者沒辦法偽造 hook 事件
+- 其他使用者無法偽造 hook 事件
 
 ### Hook Fail Open
 - App 沒開或故障時,hook 放行
-- 不會因為安全元件壞掉阻擋 Claude Code 運作
+- 不會因為安全元件壞掉阻擋 AI 工具運作
 
 ### 最小權限
 - 只要求真正需要的 macOS 權限
@@ -75,7 +67,7 @@ My Island 在設計上遵守這些原則:
 
 ### 簽章與公證
 - Release 版本會簽章
-- 簽章用 Apple Developer ID(如我有付費)或 ad-hoc(未付費)
+- 簽章用 Apple Developer ID(如果可用)或 ad-hoc
 - 會在 release notes 清楚標示
 
 ---
@@ -84,19 +76,15 @@ My Island 在設計上遵守這些原則:
 
 透明告知使用者:
 
-1. **Hook script 跟 app 同權限執行**
-   - Hook 以你的 user 身份跑,擁有你的檔案權限
-   - 這是 shell script 的天性,無法改善
-   - 我們有限制:只從 Claude Code 的可信 hook 機制觸發
+1. **Hook script 以使用者權限執行**
+   - Hook 會以你的 user 身份跑,擁有你的檔案權限
+   - 這是 shell script 的天性,無法消除
+   - 限制:只從 AI 工具的可信 hook 機制觸發
 
-2. **如果你啟用 iPhone 同步**(未來功能)
-   - 見 [PRIVACY.md](./PRIVACY.md) 的詳細說明
-   - 預計使用 end-to-end encryption
-
-3. **AppleScript 的能力**
+2. **AppleScript 能力**
    - Accessibility 權限讓 app 能控制其他 app
-   - 我們只用這個權限做 terminal tab 切換
-   - 不會截圖、不會偷看其他 app 內容
+   - 只用於 terminal tab 切換
+   - 不會截圖、不會讀取其他 app 內容
 
 ---
 
@@ -111,4 +99,4 @@ My Island 在設計上遵守這些原則:
 
 ---
 
-Thanks for helping keep My Island safe!
+Thanks for helping keep NotchCove safe!
