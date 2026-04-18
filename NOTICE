@@ -1,0 +1,83 @@
+My Island
+Copyright (c) 2026 [你的名字或 handle]
+
+This product is a modified version of software originally developed by
+others. This NOTICE file lists all third-party software incorporated or
+derived from, along with their respective copyrights and licenses.
+
+================================================================================
+Primary Base: CodeIsland
+================================================================================
+
+This product is based on CodeIsland, licensed under the MIT License.
+
+  CodeIsland
+  Copyright (c) 2025 wxtsky
+  https://github.com/wxtsky/CodeIsland
+
+The full text of the MIT License under which CodeIsland is licensed is
+available in ./LICENSE and at https://opensource.org/licenses/MIT.
+
+================================================================================
+Upstream Inspiration: claude-island
+================================================================================
+
+CodeIsland acknowledges inspiration from claude-island, licensed under the
+Apache License 2.0. While no code is directly copied from claude-island in
+this product (as of [填日期]), we acknowledge the original idea:
+
+  claude-island
+  Copyright (c) 2025 farouqaldori
+  https://github.com/farouqaldori/claude-island
+  Licensed under Apache License, Version 2.0
+
+The full text of Apache License 2.0 is available at:
+  https://www.apache.org/licenses/LICENSE-2.0
+
+[以下段落:未來真的 copy 了 Apache 2.0 程式碼時再填]
+
+[如果有從 claude-island 直接複製程式碼,請列出:
+Portions of the following files are derived from claude-island
+and retain the Apache License 2.0:
+  - Sources/X/Y.swift
+  - Sources/X/Z.swift
+]
+
+================================================================================
+Third-Party Swift Packages
+================================================================================
+
+This product uses the following open-source Swift packages. Their licenses
+can be found in the Swift Package Manager resolver output
+(Package.resolved) and in their respective repositories.
+
+[實際使用的套件會在這裡列,等 Package.swift 加了依賴再填]
+
+Example format:
+  - swift-argument-parser
+    Copyright (c) Apple Inc.
+    Apache License 2.0
+    https://github.com/apple/swift-argument-parser
+
+================================================================================
+Fonts, Icons, Sounds
+================================================================================
+
+[如果使用任何第三方素材,例如 icon、音效、字型,在此列出]
+
+Example:
+  - SF Symbols: Provided by Apple Inc., free for use in applications on
+    Apple platforms.
+
+================================================================================
+Trademarks
+================================================================================
+
+Claude is a trademark of Anthropic, PBC.
+macOS, iTerm2, Ghostty, and other terminal application names referenced
+herein are trademarks or registered trademarks of their respective owners.
+
+This product is not affiliated with, sponsored by, or endorsed by Anthropic
+or any of the terminal application vendors mentioned.
+
+================================================================================

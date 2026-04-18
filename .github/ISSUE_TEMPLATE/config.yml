@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: ❓ Question / General Discussion
+    url: https://github.com/你的handle/my-island/discussions
+    about: 一般問題或討論請到 Discussions,不要開 issue。
+  - name: 📝 Documentation Improvement
+    url: https://github.com/你的handle/my-island/edit/main/README.md
+    about: 找到文件錯字或想補充?直接發 PR 修最快。
+  - name: 🔐 Security Vulnerability
+    url: https://github.com/你的handle/my-island/security/advisories/new
+    about: 請勿公開在 issue 回報安全漏洞,使用 private advisories。
