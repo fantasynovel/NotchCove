@@ -55,7 +55,7 @@ struct NotchPanelView: View {
     /// - Extended mode: slider 100% == real physical notch width.
     /// - Compact mode: slider 100% == 1.4 × physical notch width (more room for mascot + status).
     private var effectiveNotchW: CGFloat {
-        let scale = CGFloat(max(collapsedWidthScale, 50)) / 100.0
+        let scale = CGFloat(max(collapsedWidthScale, 90)) / 100.0
         let modeMultiplier: CGFloat = isCompactLayout ? 1.4 : 1.0
         return notchW * scale * modeMultiplier
     }
@@ -2032,9 +2032,18 @@ private struct SessionCard: View {
             if !session.recentMessages.isEmpty || session.status != .idle {
                 VStack(alignment: .leading, spacing: 3) {
                     // Chat messages (detailed mode only)
-                    let visibleMessages = session.status != .idle
-                        ? Array(session.recentMessages.suffix(2))
-                        : session.recentMessages
+                    let visibleMessages: [ChatMessage] = {
+                        if session.status != .idle {
+                            return Array(session.recentMessages.suffix(2))
+                        }
+                        // Idle: show the most recent user + AI pair, preserving chronological order
+                        let recent = session.recentMessages
+                        let indices = [
+                            recent.lastIndex(where: { $0.isUser }),
+                            recent.lastIndex(where: { !$0.isUser }),
+                        ].compactMap { $0 }.sorted()
+                        return indices.map { recent[$0] }
+                    }()
                     ForEach(visibleMessages) { msg in
                         // Extracted to separate view so SwiftUI skips re-rendering
                         // when only the parent's hover state changes (#52 perf).
@@ -2049,8 +2058,8 @@ private struct SessionCard: View {
                     // Working indicator: show what AI is doing right now
                     if session.status != .idle {
                         HStack(spacing: 4) {
-                            Text("$")
-                                .font(.system(size: fontSize, weight: .bold, design: .monospaced))
+                            Text("AI")
+                                .font(.system(size: fontSize, weight: .medium, design: .monospaced))
                                 .foregroundStyle(Color(red: 0.85, green: 0.47, blue: 0.34))
                             if let tool = session.currentTool {
                                 MorphText(
@@ -2705,19 +2714,19 @@ private struct ChatMessageRow: View, Equatable {
     var body: some View {
         if isUser {
             HStack(alignment: .top, spacing: 4) {
-                Text(">")
-                    .font(.system(size: fontSize, weight: .bold, design: .monospaced))
-                    .foregroundStyle(Color(hex: "#4CD966"))
-                Text(ChatMessageTextFormatter.literalText(text))
+                Text("You")
                     .font(.system(size: fontSize, weight: .medium, design: .monospaced))
+                    .foregroundStyle(Color(hex: "#A7A7A7"))
+                Text(ChatMessageTextFormatter.literalText(text))
+                    .font(.system(size: fontSize, weight: .regular, design: .monospaced))
                     .foregroundStyle(Color(hex: "#A7A7A7"))
                     .lineLimit(1)
                     .truncationMode(.tail)
             }
         } else {
             HStack(alignment: .top, spacing: 4) {
-                Text("$")
-                    .font(.system(size: fontSize, weight: .bold, design: .monospaced))
+                Text("AI")
+                    .font(.system(size: fontSize, weight: .medium, design: .monospaced))
                     .foregroundStyle(Color(red: 0.85, green: 0.47, blue: 0.34))
                 Text(ChatMessageTextFormatter.inlineMarkdown(compactText(stripDirectives(text))))
                     .font(.system(size: fontSize, design: .monospaced))

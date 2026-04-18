@@ -739,7 +739,7 @@ private struct AppearancePage: View {
                     Slider(value: Binding(
                         get: { Double(collapsedWidthScale) },
                         set: { collapsedWidthScale = Int($0) }
-                    ), in: 50...150, step: 10)
+                    ), in: 90...150, step: 10)
                     Text(l10n["collapsed_width_scale_desc"])
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -806,7 +806,7 @@ private struct AppearancePreview: View {
     let showDetails: Bool
 
     private var fs: CGFloat { CGFloat(fontSize) }
-    private let green = Color(red: 0.3, green: 0.85, blue: 0.4)
+    private let userColor = Color(hex: "#A7A7A7")
     private let aiColor = Color(red: 0.85, green: 0.47, blue: 0.34)
 
     var body: some View {
@@ -829,7 +829,7 @@ private struct AppearancePreview: View {
                 HStack(spacing: 6) {
                     Text("my-project")
                         .font(.system(size: fs + 2, weight: .bold, design: .monospaced))
-                        .foregroundStyle(green)
+                        .foregroundStyle(.white)
                     Spacer()
                     Text("3m")
                         .font(.system(size: max(9, fs - 1.5), weight: .medium, design: .monospaced))
@@ -843,18 +843,18 @@ private struct AppearancePreview: View {
                 VStack(alignment: .leading, spacing: 3) {
                     // User prompt
                     HStack(alignment: .top, spacing: 4) {
-                        Text(">")
-                            .font(.system(size: fs, weight: .bold, design: .monospaced))
-                            .foregroundStyle(green)
-                        Text("Fix the login bug")
+                        Text("You")
                             .font(.system(size: fs, weight: .medium, design: .monospaced))
-                            .foregroundStyle(.white.opacity(0.9))
+                            .foregroundStyle(userColor)
+                        Text("Fix the login bug")
+                            .font(.system(size: fs, weight: .regular, design: .monospaced))
+                            .foregroundStyle(userColor)
                             .lineLimit(1)
                     }
                     // AI reply
                     HStack(alignment: .top, spacing: 4) {
-                        Text("$")
-                            .font(.system(size: fs, weight: .bold, design: .monospaced))
+                        Text("AI")
+                            .font(.system(size: fs, weight: .medium, design: .monospaced))
                             .foregroundStyle(aiColor)
                         Text("I've analyzed the codebase and found the issue in the authentication module. The token validation was skipping the expiry check when refreshing sessions.")
                             .font(.system(size: fs, design: .monospaced))
@@ -864,8 +864,8 @@ private struct AppearancePreview: View {
                     }
                     // Working indicator
                     HStack(spacing: 4) {
-                        Text("$")
-                            .font(.system(size: fs, weight: .bold, design: .monospaced))
+                        Text("AI")
+                            .font(.system(size: fs, weight: .medium, design: .monospaced))
                             .foregroundStyle(aiColor)
                         Text("Edit src/auth.ts")
                             .font(.system(size: fs, design: .monospaced))
@@ -879,7 +879,7 @@ private struct AppearancePreview: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color(white: 0.05))
         )
         .animation(.easeInOut(duration: 0.25), value: fontSize)
