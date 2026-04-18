@@ -123,7 +123,7 @@ struct SettingsDefaults {
 
     static let showToolStatus = true
 
-    static let collapsedWidthScale = 100  // percentage
+    static let collapsedWidthScale = 100  // percentage; 100% == real notch width
 }
 
 @MainActor

@@ -46,9 +46,8 @@ struct NotchPanelView: View {
     /// Minimum wing width needed to display compact bar content
     private var compactWingWidth: CGFloat { mascotSize + 14 }
 
-    /// Effective notch width — applies user scale on non-notch screens (#56).
+    /// Effective notch width — slider 100% == real physical notch width.
     private var effectiveNotchW: CGFloat {
-        guard !hasNotch else { return notchW }
         let scale = CGFloat(max(collapsedWidthScale, 50)) / 100.0
         return notchW * scale
     }
@@ -58,7 +57,7 @@ struct NotchPanelView: View {
         let nw = effectiveNotchW
         let maxWidth = min(620, screenWidth - 40)
         if showIdleIndicator { return idleHovered ? nw + compactWingWidth * 2 + 80 : nw + compactWingWidth * 2 }
-        if !isActive { return hasNotch ? notchW - 20 : nw }
+        if !isActive { return nw }
         if shouldShowExpanded { return min(max(nw + 200, 580), maxWidth) }
         let wing = compactWingWidth
         let extra: CGFloat = appState.status == .idle ? 0 : 20
@@ -1640,29 +1639,6 @@ private struct SessionIdentityLine: View {
                 color: projectColor
             )
             .layoutPriority(2)
-
-            if let sessionLabel = session.sessionLabel {
-                Text("#\(sessionLabel)")
-                    .font(.system(size: sessionFontSize, weight: .medium, design: .monospaced))
-                    .foregroundStyle(sessionColor)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-                    .layoutPriority(1)
-
-                Text("·")
-                    .font(.system(size: sessionFontSize, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(dividerColor)
-
-                Text("#\(shortSessionId(displaySessionId))")
-                    .font(.system(size: sessionFontSize, weight: .medium, design: .monospaced))
-                    .foregroundStyle(sessionColor.opacity(0.6))
-                    .fixedSize()
-            } else {
-                Text("#\(shortSessionId(displaySessionId))")
-                    .font(.system(size: sessionFontSize, weight: .medium, design: .monospaced))
-                    .foregroundStyle(sessionColor.opacity(0.6))
-                    .fixedSize()
-            }
         }
     }
 }
