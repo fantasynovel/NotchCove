@@ -55,7 +55,7 @@ struct NotchPanelView: View {
     /// - Extended mode: slider 100% == real physical notch width.
     /// - Compact mode: slider 100% == 1.4 × physical notch width (more room for mascot + status).
     private var effectiveNotchW: CGFloat {
-        let scale = CGFloat(max(collapsedWidthScale, 90)) / 100.0
+        let scale = CGFloat(max(collapsedWidthScale, 100)) / 100.0
         let modeMultiplier: CGFloat = isCompactLayout ? 1.4 : 1.0
         return notchW * scale * modeMultiplier
     }

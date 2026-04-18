@@ -775,7 +775,7 @@ private struct AppearancePage: View {
                     Slider(value: Binding(
                         get: { Double(collapsedWidthScale) },
                         set: { collapsedWidthScale = Int($0) }
-                    ), in: 90...150, step: 10)
+                    ), in: 100...150, step: 10)
                     Text(l10n["collapsed_width_scale_desc"])
                         .settingsDesc()
                 }
