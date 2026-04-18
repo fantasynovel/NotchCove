@@ -110,11 +110,13 @@ struct NotchPanelView: View {
                     switch appState.surface {
                     case .approvalCard:
                         if let pending = appState.pendingPermission {
+                            let pendingSource = appState.sessions[pending.event.sessionId ?? ""]?.source ?? appState.primarySource
                             ApprovalBar(
                                 tool: pending.event.toolName ?? "Unknown",
                                 toolInput: pending.event.toolInput,
                                 queuePosition: 1,
                                 queueTotal: appState.permissionQueue.count,
+                                source: pendingSource,
                                 onAllow: { appState.approvePermission(always: false) },
                                 onAlwaysAllow: { appState.approvePermission(always: true) },
                                 onDeny: { appState.denyPermission() },
@@ -335,7 +337,7 @@ private struct CompactLeftWing: View {
                             } label: {
                                 PixelText(
                                     text: label,
-                                    color: selected ? Color(red: 0.3, green: 0.85, blue: 0.4) : .white.opacity(0.3),
+                                    color: selected ? Color(hex: "#118CFF") : .white.opacity(0.3),
                                     pixelSize: 1.3
                                 )
                                 .padding(.horizontal, 5)
@@ -827,10 +829,19 @@ private struct ApprovalBar: View {
     let toolInput: [String: Any]?
     let queuePosition: Int
     let queueTotal: Int
+    let source: String
     let onAllow: () -> Void
     let onAlwaysAllow: () -> Void
     let onDeny: () -> Void
     let onDismiss: () -> Void
+
+    private var alwaysBg: Color {
+        switch source {
+        case "claude": return Color(hex: "#E16503")
+        case "codex": return Color(hex: "#6E59F8")
+        default: return Color(hex: "#3B7ACF")
+        }
+    }
 
     private var fileName: String? {
         guard let fp = toolInput?["file_path"] as? String else { return nil }
@@ -889,10 +900,10 @@ private struct ApprovalBar: View {
 
             // Pixel-style buttons
             HStack(spacing: 6) {
-                PixelButton(label: L10n.shared["deny"], fg: .white.opacity(0.95), bg: Color(red: 0.45, green: 0.12, blue: 0.12), border: Color(red: 0.7, green: 0.25, blue: 0.25), action: onDeny)
-                PixelButton(label: L10n.shared["dismiss"], fg: .white.opacity(0.95), bg: Color(red: 0.25, green: 0.25, blue: 0.25), border: Color.white.opacity(0.28), action: onDismiss)
-                PixelButton(label: L10n.shared["allow_once"], fg: .white.opacity(0.95), bg: Color(red: 0.16, green: 0.38, blue: 0.18), border: Color(red: 0.28, green: 0.62, blue: 0.32), action: onAllow)
-                PixelButton(label: L10n.shared["always"], fg: .white.opacity(0.95), bg: Color(red: 0.14, green: 0.28, blue: 0.52), border: Color(red: 0.28, green: 0.48, blue: 0.82), action: onAlwaysAllow)
+                PixelButton(label: L10n.shared["deny"], fg: .white.opacity(0.95), bg: Color(hex: "#BC011C"), cornerRadius: 8, action: onDeny)
+                PixelButton(label: L10n.shared["dismiss"], fg: .white.opacity(0.95), bg: Color(hex: "#313030"), cornerRadius: 8, action: onDismiss)
+                PixelButton(label: L10n.shared["always"], fg: .white.opacity(0.95), bg: alwaysBg, cornerRadius: 8, action: onAlwaysAllow)
+                PixelButton(label: L10n.shared["allow_once"], fg: Color(hex: "#1B2839"), bg: Color(hex: "#FFFFFF"), cornerRadius: 8, action: onAllow)
             }
             .padding(.horizontal, 14)
         }
@@ -1396,7 +1407,8 @@ private struct PixelButton: View {
     let label: String
     let fg: Color
     let bg: Color
-    let border: Color
+    var border: Color? = nil
+    var cornerRadius: CGFloat = 4
     let action: () -> Void
     @State private var hovering = false
 
@@ -1408,12 +1420,16 @@ private struct PixelButton: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 7)
                 .background(
-                    RoundedRectangle(cornerRadius: 4)
+                    RoundedRectangle(cornerRadius: cornerRadius)
                         .fill(hovering ? bg.opacity(1.5) : bg)
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 4)
-                        .strokeBorder(hovering ? border : border.opacity(0.4), lineWidth: 1)
+                    Group {
+                        if let border {
+                            RoundedRectangle(cornerRadius: cornerRadius)
+                                .strokeBorder(hovering ? border : border.opacity(0.4), lineWidth: 1)
+                        }
+                    }
                 )
         }
         .buttonStyle(.plain)
