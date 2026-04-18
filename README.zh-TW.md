@@ -19,7 +19,7 @@
 
 ## NotchCove 是什麼?
 
-> 本專案是基於 [wxtsky/CodeIsland](https://github.com/wxtsky/CodeIsland) 的調整版本，並針對 UI 排版、字級對比、可及性(WCAG)、繁體中文在地做優化。
+> 本專案是基於 [wxtsky/CodeIsland](https://github.com/wxtsky/CodeIsland) 的調整版本，並針對 UI 排版、字級對比、可及性(WCAG)、繁體中文在地做優化，還可以客製化 AI 角色動畫參數。
 
 NotchCove 住在你 MacBook 的瀏海區域，即時顯示 AI 編碼 Agent 的工作狀態。再也不用一直切窗口確認 Claude 是否在等待審批，或 Codex 是否完成任務。
 
