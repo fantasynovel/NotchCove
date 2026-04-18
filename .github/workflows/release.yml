@@ -40,7 +40,7 @@ jobs:
             desc "Menu bar companion for Claude Code, Codex, Gemini CLI and more"
             homepage "https://github.com/fantasynovel/NotchCove"
 
-            app "NotchCove.app"
+            app "Notch Cove.app"
 
             zap trash: [
               "~/.notchcove",
