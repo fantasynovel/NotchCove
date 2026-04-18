@@ -41,7 +41,7 @@ It connects to multiple AI coding tools via Unix socket IPC, displaying session 
 - **Live status tracking** — See active sessions, tool calls, and AI responses in real time
 - **Out-of-order permission approval** — Approve or deny tool permissions in any order, directly from the panel
 - **Interactive Q&A** — Respond to agent questions without leaving the notch
-- **Pixel mascots + Mascot Lab** — Each AI tool has its own animated pixel mascot; preview and tune them in the dedicated Mascot Lab tab
+- **Pixel mascots + Mascot Lab** — Each AI tool has its own animated pixel mascot; preview and tune them in the dedicated Mascot Lab tab, including customizable mascot animation parameters
 - **Working animations** — Playful loaders (e.g. dumbbell curls for Claude) instead of generic spinners
 - **Precise terminal jump** — Click a session to jump to its exact terminal tab or IDE window
 - **Smart notification suppression** — Tab-level detection: only suppresses notifications when you're actually looking at that session's tab
