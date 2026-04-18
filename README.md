@@ -25,6 +25,8 @@
 
 ## What is NotchCove?
 
+> This project is a modified build of [wxtsky/CodeIsland](https://github.com/wxtsky/CodeIsland), with substantial changes to layout, typography, accessibility (WCAG), Traditional Chinese localization, and mascot / animation work.
+
 NotchCove lives in your MacBook's notch area and shows you what your AI coding agents are doing — in real time. No more switching windows to check if Claude is waiting for approval or if Codex finished its task.
 
 It connects to multiple AI coding tools via Unix socket IPC, displaying session status, tool calls, permission requests, and more — all in a compact pixel-style panel that slides out of the notch.
@@ -80,27 +82,23 @@ It connects to multiple AI coding tools via Unix socket IPC, displaying session 
 
 ## Install
 
-### Homebrew (coming soon)
-
-```bash
-# Not published yet — see manual install below
-# brew tap fantasynovel/tap
-# brew install --cask notchcove
-```
-
 ### Manual Download
 
-1. Go to [Releases](https://github.com/fantasynovel/NotchCove/releases)
-2. Download `NotchCove.dmg`
-3. Open the DMG and drag `NotchCove.app` into `Applications`
-4. Launch — hooks are installed automatically for every detected AI tool
+1. [Download the latest release](https://github.com/fantasynovel/NotchCove/releases/latest) (`NotchCove.dmg`)
+2. Open the DMG and drag **Notch Cove** into **Applications**
+3. Double-click to launch — on first open, macOS will show a security warning ⚠️. **Don't send it to the trash!**
 
-**First launch:** macOS may show a security warning if the build is not notarized yet.
-Right-click `NotchCove.app` → **Open** → **Open** in the dialog, or run:
+This build is not Apple Developer–signed (Apple Developer Program costs $99 USD/year). Unblock it one of two ways:
+
+**Option A:** Go to **System Settings → Privacy & Security**, scroll down to "Notch Cove was blocked" and click **Open Anyway**.
+
+**Option B:** Open Terminal and run:
 
 ```bash
-xattr -dr com.apple.quarantine "/Applications/NotchCove.app"
+xattr -dr com.apple.quarantine "/Applications/Notch Cove.app"
 ```
+
+Once unblocked, launching Notch Cove will auto-install hooks for every detected AI tool.
 
 ### Build from Source
 
@@ -115,7 +113,7 @@ swift build && ./.build/debug/CodeIsland
 
 # Release build (universal binary: Apple Silicon + Intel)
 ./build.sh
-open .build/release/CodeIsland.app
+open ".build/release/Notch Cove.app"
 ```
 
 > Note: the Swift target is still named `CodeIsland` internally from the original fork. A full code-level rename to `NotchCove` is planned for a future release.
