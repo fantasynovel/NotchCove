@@ -6,7 +6,6 @@ BINARY_NAME="CodeIsland"
 BUILD_DIR=".build/release"
 APP_BUNDLE="$BUILD_DIR/$APP_NAME.app"
 ICON_CATALOG="Assets.xcassets"
-ICON_SOURCE="AppIcon.icon"
 ICON_INFO_PLIST=".build/AppIcon.partial.plist"
 
 echo "Building $APP_NAME (universal)..."
@@ -41,8 +40,7 @@ xcrun actool \
     --app-icon AppIcon \
     --output-partial-info-plist "$ICON_INFO_PLIST" \
     --compile "$APP_BUNDLE/Contents/Resources" \
-    "$ICON_CATALOG" \
-    "$ICON_SOURCE"
+    "$ICON_CATALOG"
 
 # Copy SPM resource bundles into Contents/Resources/ (required for code signing)
 for bundle in .build/*/release/*.bundle; do

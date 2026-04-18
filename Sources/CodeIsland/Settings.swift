@@ -106,7 +106,7 @@ struct SettingsDefaults {
 
     static let maxPanelHeight = 560
     static let maxVisibleSessions = 5
-    static let contentFontSize = 11
+    static let contentFontSize = 12
     static let aiMessageLines = 1
     static let showAgentDetails = false
     static let notchHeightMode = NotchHeightMode.matchNotch.rawValue
