@@ -15,6 +15,9 @@ final class L10n: ObservableObject {
     var effectiveLanguage: String {
         if language == "system" {
             let preferred = Locale.preferredLanguages.first ?? "en"
+            if preferred.hasPrefix("zh-Hant") || preferred.hasPrefix("zh-TW") || preferred.hasPrefix("zh-HK") || preferred.hasPrefix("zh-MO") {
+                return "zh-Hant"
+            }
             if preferred.hasPrefix("zh") { return "zh" }
             if preferred.hasPrefix("ja") { return "ja" }
             if preferred.hasPrefix("tr") { return "tr" }
@@ -33,6 +36,7 @@ final class L10n: ObservableObject {
     static let strings: [String: [String: String]] = [
         "en": en,
         "zh": zh,
+        "zh-Hant": zhHant,
         "ja": ja,
         "ko": ko,
         "tr": tr,
@@ -83,7 +87,7 @@ final class L10n: ObservableObject {
         "shortcut_recording": "Recording…",
         "shortcut_none": "Not Set",
         "shortcut_togglePanel": "Toggle Panel",
-        "shortcut_togglePanel_desc": "Open or close the CodeIsland panel",
+        "shortcut_togglePanel_desc": "Open or close the Notch Cove panel",
         "shortcut_approve": "Approve",
         "shortcut_approve_desc": "Approve current permission request",
         "shortcut_approveAlways": "Approve Always",
@@ -165,7 +169,7 @@ final class L10n: ObservableObject {
         "tool_or_api_error": "Tool failure or API error",
         "system_section": "System",
         "boot_sound": "Boot Sound",
-        "boot_sound_desc": "Play a jingle when CodeIsland starts",
+        "boot_sound_desc": "Play a jingle when Notch Cove starts",
         "interaction": "Interaction",
         "approval_needed": "Approval Needed",
         "waiting_approval_desc": "Waiting for permission approval or answer",
@@ -199,7 +203,7 @@ final class L10n: ObservableObject {
         "remote_auth_socket_placeholder": "~/.1password/agent.sock",
         "remote_auto_connect": "Auto-connect on Launch",
         "remote_add_button": "Add Host",
-        "remote_hint": "The host field can be a normal hostname or an alias from your ~/.ssh/config. CodeIsland installs a small remote hook script and forwards events over SSH.",
+        "remote_hint": "The host field can be a normal hostname or an alias from your ~/.ssh/config. Notch Cove installs a small remote hook script and forwards events over SSH.",
         "remote_connect": "Connect",
         "remote_connecting": "Connecting…",
         "remote_connected": "Connected",
@@ -212,7 +216,7 @@ final class L10n: ObservableObject {
         "about_desc2": "Supports 11 CLI/IDE tools via Unix socket IPC",
 
         // Window
-        "settings_title": "CodeIsland Settings",
+        "settings_title": "Notch Cove Settings",
 
         // Menu
         "settings_ellipsis": "Settings...",
@@ -225,11 +229,11 @@ final class L10n: ObservableObject {
 
         // Update
         "update_available_title": "Update Available",
-        "update_available_body": "CodeIsland %@ is available (current: %@). Would you like to download it?",
+        "update_available_body": "Notch Cove %@ is available (current: %@). Would you like to download it?",
         "download_update": "Download",
         "later": "Later",
         "no_update_title": "Up to Date",
-        "no_update_body": "CodeIsland %@ is the latest version.",
+        "no_update_body": "Notch Cove %@ is the latest version.",
         "ok": "OK",
         "update_now": "Update Now",
         "update_downloading": "Downloading update...",
@@ -239,8 +243,8 @@ final class L10n: ObservableObject {
         "update_installing": "Installing update...",
         "update_retry": "Retry",
         "update_homebrew_title": "Update Available",
-        "update_homebrew_body": "CodeIsland %@ is available. Since you installed via Homebrew, please run:",
-        "update_homebrew_command": "brew upgrade codeisland",
+        "update_homebrew_body": "Notch Cove %@ is available. Since you installed via Homebrew, please run:",
+        "update_homebrew_command": "brew upgrade notchcove",
         "update_copy_command": "Copy Command",
 
         // NotchPanel
@@ -319,7 +323,7 @@ final class L10n: ObservableObject {
         "shortcut_recording": "请按下快捷键…",
         "shortcut_none": "未设置",
         "shortcut_togglePanel": "切换面板",
-        "shortcut_togglePanel_desc": "展开或收起 CodeIsland 面板",
+        "shortcut_togglePanel_desc": "展开或收起 Notch Cove 面板",
         "shortcut_approve": "批准",
         "shortcut_approve_desc": "批准当前权限请求",
         "shortcut_approveAlways": "始终批准",
@@ -401,7 +405,7 @@ final class L10n: ObservableObject {
         "tool_or_api_error": "工具失败或 API 错误",
         "system_section": "系统",
         "boot_sound": "启动音效",
-        "boot_sound_desc": "CodeIsland 启动时播放提示音",
+        "boot_sound_desc": "Notch Cove 启动时播放提示音",
         "interaction": "交互",
         "approval_needed": "需要审批",
         "waiting_approval_desc": "等待权限审批或回答问题",
@@ -435,7 +439,7 @@ final class L10n: ObservableObject {
         "remote_auth_socket_placeholder": "~/.1password/agent.sock",
         "remote_auto_connect": "启动时自动连接",
         "remote_add_button": "添加主机",
-        "remote_hint": "主机字段既可以填普通 hostname，也可以直接填 ~/.ssh/config 里的别名。CodeIsland 会在远端安装一个很小的 hook 脚本，并通过 SSH 转发事件回来。",
+        "remote_hint": "主机字段既可以填普通 hostname，也可以直接填 ~/.ssh/config 里的别名。Notch Cove 会在远端安装一个很小的 hook 脚本，并通过 SSH 转发事件回来。",
         "remote_connect": "连接",
         "remote_connecting": "连接中…",
         "remote_connected": "已连接",
@@ -444,11 +448,11 @@ final class L10n: ObservableObject {
         "remote_remove": "删除",
 
         // About
-        "about_desc1": "macOS 实时 AI 编码 Agent 状态面板",
+        "about_desc1": "macOS 实时 AI Agent 状态面板",
         "about_desc2": "通过 Unix socket IPC 支持 11 种 CLI/IDE 工具",
 
         // Window
-        "settings_title": "CodeIsland 设置",
+        "settings_title": "Notch Cove 设置",
 
         // Menu
         "settings_ellipsis": "设置...",
@@ -461,11 +465,11 @@ final class L10n: ObservableObject {
 
         // Update
         "update_available_title": "发现新版本",
-        "update_available_body": "CodeIsland %@ 已发布（当前版本：%@），是否前往下载？",
+        "update_available_body": "Notch Cove %@ 已发布（当前版本：%@），是否前往下载？",
         "download_update": "前往下载",
         "later": "稍后",
         "no_update_title": "已是最新版本",
-        "no_update_body": "CodeIsland %@ 已是最新版本。",
+        "no_update_body": "Notch Cove %@ 已是最新版本。",
         "ok": "好",
         "update_now": "立即更新",
         "update_downloading": "正在下载更新...",
@@ -475,8 +479,8 @@ final class L10n: ObservableObject {
         "update_installing": "正在安装更新...",
         "update_retry": "重试",
         "update_homebrew_title": "发现新版本",
-        "update_homebrew_body": "CodeIsland %@ 已发布。由于您通过 Homebrew 安装，请运行：",
-        "update_homebrew_command": "brew upgrade codeisland",
+        "update_homebrew_body": "Notch Cove %@ 已发布。由于您通过 Homebrew 安装，请运行：",
+        "update_homebrew_command": "brew upgrade notchcove",
         "update_copy_command": "复制命令",
 
         // NotchPanel
@@ -507,6 +511,242 @@ final class L10n: ObservableObject {
         "n_sessions": "个会话",
         "scroll_for_more": "向下滚动查看更多",
         "scroll_hidden": "个未显示",
+        "lines": "行",
+    ]
+
+    private static let zhHant: [String: String] = [
+        // Settings pages
+        "general": "一般",
+        "behavior": "行為",
+        "appearance": "外觀",
+        "mascots": "角色",
+        "sound": "聲音",
+        "remote": "遠端",
+        "hooks": "Hooks",
+        "about": "關於",
+
+        // Language
+        "language": "語言",
+        "system_language": "系統預設",
+
+        // General
+        "launch_at_login": "登入時開啟",
+        "allow_horizontal_drag": "允許水平拖曳面板",
+        "allow_horizontal_drag_desc": "開啟後可沿選單列左右拖曳面板位置",
+        "display": "顯示器",
+        "auto": "自動",
+        "builtin_display": "內建顯示器",
+        "notch": "(瀏海)",
+
+        // Behavior
+        "display_section": "顯示",
+        "hide_in_fullscreen": "全螢幕時隱藏",
+        "hide_in_fullscreen_desc": "當任一應用程式進入全螢幕模式時自動隱藏面板",
+        "hide_when_no_session": "無活躍工作階段時自動隱藏",
+        "hide_when_no_session_desc": "沒有 AI Agent 執行時完全隱藏面板",
+        "smart_suppress": "智慧抑制",
+        "smart_suppress_desc": "Agent 所在終端機分頁在前景時不自動展開面板",
+        "collapse_on_mouse_leave": "滑鼠離開時自動收合",
+        "collapse_on_mouse_leave_desc": "滑鼠移出展開的面板後自動收回瀏海狀態",
+        "auto_collapse_after_session_jump": "點擊跳轉工作階段後自動收合面板",
+        "auto_collapse_after_session_jump_desc": "點擊工作階段並成功切換到對應終端機/用戶端後自動收合面板",
+        "haptic_on_hover": "懸停觸控板震動",
+        "haptic_on_hover_desc": "滑鼠懸停在瀏海上時觸發觸控板震動回饋",
+        "haptic_light": "輕",
+        "haptic_medium": "中",
+        "haptic_strong": "強",
+        "shortcuts": "快捷鍵",
+        "shortcut_recording": "請按下快捷鍵…",
+        "shortcut_none": "未設定",
+        "shortcut_togglePanel": "切換面板",
+        "shortcut_togglePanel_desc": "展開或收合面板",
+        "shortcut_approve": "核准",
+        "shortcut_approve_desc": "核准目前的權限請求",
+        "shortcut_approveAlways": "總是核准",
+        "shortcut_approveAlways_desc": "核准並記住本次工作階段",
+        "shortcut_deny": "拒絕",
+        "shortcut_deny_desc": "拒絕目前的權限請求",
+        "shortcut_skipQuestion": "略過問題",
+        "shortcut_skipQuestion_desc": "略過目前的問答提示",
+        "shortcut_jumpToTerminal": "跳轉終端機",
+        "shortcut_jumpToTerminal_desc": "切換到目前活躍階段的終端機",
+        "shortcut_conflict": "與下列快捷鍵衝突：",
+        "sessions": "工作階段",
+        "session_cleanup": "閒置工作階段清理",
+        "session_cleanup_desc": "自動移除超過指定時間沒有活動的工作階段",
+        "no_cleanup": "不清理",
+        "10_minutes": "10 分鐘",
+        "30_minutes": "30 分鐘",
+        "1_hour": "1 小時",
+        "2_hours": "2 小時",
+        "rotation_interval": "工作階段輪替間隔",
+        "rotation_interval_desc": "收合狀態下多個活躍工作階段之間的切換頻率",
+        "3_seconds": "3 秒",
+        "5_seconds": "5 秒",
+        "8_seconds": "8 秒",
+        "10_seconds": "10 秒",
+        "tool_history_limit": "工具歷史上限",
+        "tool_history_limit_desc": "每個工作階段顯示的最近工具呼叫數量上限",
+
+        // Appearance
+        "preview": "預覽",
+        "panel": "面板",
+        "max_visible_sessions": "最大顯示工作階段數",
+        "max_visible_sessions_desc": "超出數量的工作階段將透過捲動檢視",
+        "collapsed_width_scale": "動態島寬度",
+        "collapsed_width_scale_desc": "調整動態島收合寬度（100% 對齊實體瀏海）",
+        "notch_layout_mode": "動態島版面",
+        "notch_layout_mode_desc": "延伸模式在瀏海兩側顯示狀態；緊湊模式將內容完全收進實體瀏海範圍",
+        "notch_layout_extended": "延伸",
+        "notch_layout_compact": "緊湊",
+        "notch_height_mode": "頂部高度對齊",
+        "notch_height_mode_desc": "讓面板與實際 notch 高度、選單列高度或自訂值對齊",
+        "notch_height_match_notch": "對齊 notch 高度",
+        "notch_height_match_menubar": "對齊選單列高度",
+        "notch_height_custom": "自訂高度",
+        "custom_notch_height": "自訂高度",
+        "default": "預設",
+        "content": "內容",
+        "content_font_size": "內容字型大小",
+        "11pt_default": "11pt（預設）",
+        "ai_reply_lines": "AI 回覆行數",
+        "1_line_default": "1 行（預設）",
+        "2_lines": "2 行",
+        "3_lines": "3 行",
+        "5_lines": "5 行",
+        "unlimited": "不限制",
+        "show_agent_details": "顯示代理活動詳情",
+        "show_tool_status": "緊湊列顯示工具呼叫詳情",
+
+        // Mascots
+        "preview_status": "預覽狀態",
+        "processing": "工作中",
+        "idle": "閒置",
+        "waiting_approval": "等待核准",
+        "mascot_speed": "動畫速度",
+        "speed_off": "關閉",
+        "speed_slow": "0.5× 慢速",
+        "speed_normal": "1× 正常",
+        "speed_fast": "1.5× 快速",
+        "speed_very_fast": "2× 極速",
+
+        // Sound
+        "enable_sound": "啟用音效",
+        "volume": "音量",
+        "session_start": "工作階段開始",
+        "new_claude_session": "新的 Claude Code 工作階段",
+        "task_complete": "任務完成",
+        "ai_completed_reply": "AI 完成了本輪回覆",
+        "task_error": "任務錯誤",
+        "tool_or_api_error": "工具失敗或 API 錯誤",
+        "system_section": "系統",
+        "boot_sound": "啟動音效",
+        "boot_sound_desc": "Notch Cove 啟動時播放提示音",
+        "interaction": "互動",
+        "approval_needed": "需要核准",
+        "waiting_approval_desc": "等待權限核准或回答問題",
+        "task_confirmation": "任務確認",
+        "you_sent_message": "你送出了一則訊息",
+        "custom_sound": "自訂",
+        "choose_sound_file": "選擇音效檔案",
+        "reset_to_default": "恢復預設",
+        "custom_sound_set": "自訂：%@",
+
+        // Hooks
+        "cli_status": "CLI 狀態",
+        "activated": "已啟用",
+        "not_installed": "未安裝",
+        "not_detected": "未偵測到",
+        "management": "管理",
+        "reinstall": "重新安裝",
+        "uninstall": "解除安裝",
+        "hooks_installed": "Hooks 安裝成功",
+        "install_failed": "安裝失敗",
+        "hooks_uninstalled": "Hooks 已解除安裝",
+        "remote_hosts": "遠端主機",
+        "remote_hosts_empty": "還沒有遠端主機。你可以在下方新增，透過 SSH 監控遠端工作階段。",
+        "add_remote_host": "新增遠端主機",
+        "remote_name": "顯示名稱",
+        "remote_host": "主機名稱或 SSH 別名",
+        "remote_user": "SSH 使用者（選填）",
+        "remote_port": "SSH 連接埠（選填）",
+        "remote_identity": "私鑰檔案（選填）",
+        "remote_auth_socket": "SSH_AUTH_SOCK（選填）",
+        "remote_auth_socket_placeholder": "~/.1password/agent.sock",
+        "remote_auto_connect": "啟動時自動連線",
+        "remote_add_button": "新增主機",
+        "remote_hint": "主機欄位可以填一般 hostname，也可以直接填 ~/.ssh/config 裡的別名。Notch Cove 會在遠端安裝一個很小的 hook 腳本，並透過 SSH 轉發事件回來。",
+        "remote_connect": "連線",
+        "remote_connecting": "連線中…",
+        "remote_connected": "已連線",
+        "remote_disconnected": "未連線",
+        "remote_disconnect": "中斷連線",
+        "remote_remove": "刪除",
+
+        // About
+        "about_desc1": "macOS 即時 AI Agent 狀態面板",
+        "about_desc2": "透過 Unix socket IPC 支援 11 種 CLI/IDE 工具",
+
+        // Window
+        "settings_title": "Notch Cove 設定",
+
+        // Menu
+        "settings_ellipsis": "設定…",
+        "check_for_updates": "檢查更新…",
+        "export_diagnostics": "匯出診斷資訊…",
+        "export_diagnostics_desc": "建立包含記錄檔、設定與工作階段狀態的 zip 檔案，用於回報 Bug",
+        "reinstall_hooks": "重新安裝 Hooks",
+        "remove_hooks": "解除安裝 Hooks",
+        "quit": "結束",
+
+        // Update
+        "update_available_title": "發現新版本",
+        "update_available_body": "Notch Cove %@ 已發佈（目前版本：%@），是否前往下載？",
+        "download_update": "前往下載",
+        "later": "稍後",
+        "no_update_title": "已是最新版本",
+        "no_update_body": "Notch Cove %@ 已是最新版本。",
+        "ok": "好",
+        "update_now": "立即更新",
+        "update_downloading": "正在下載更新…",
+        "update_failed_title": "更新失敗",
+        "update_failed_body": "無法安裝更新：%@",
+        "update_manual_download": "手動下載",
+        "update_installing": "正在安裝更新…",
+        "update_retry": "重試",
+        "update_homebrew_title": "發現新版本",
+        "update_homebrew_body": "Notch Cove %@ 已發佈。由於您透過 Homebrew 安裝，請執行：",
+        "update_homebrew_command": "brew upgrade notchcove",
+        "update_copy_command": "複製指令",
+
+        // NotchPanel
+        "mute": "靜音",
+        "enable_sound_tooltip": "開啟音效",
+        "settings": "設定",
+        "deny": "拒絕",
+        "dismiss": "忽略",
+        "allow_once": "允許一次",
+        "always": "總是允許",
+        "approval_queue_label": "核准 %d/%d：%@",
+        "approval_details_expand": "詳情",
+        "approval_details_collapse": "收合",
+        "type_answer": "輸入回答…",
+        "skip": "略過",
+        "back": "返回",
+        "confirm": "確認",
+        "submit": "送出",
+        "open_path": "開啟",
+        "copy_session_id": "複製工作階段 ID",
+
+        // Session grouping
+        "status_running": "執行中",
+        "status_waiting": "等待中",
+        "status_processing": "處理中",
+        "status_idle": "閒置",
+        "other": "其他",
+        "n_sessions": "個工作階段",
+        "scroll_for_more": "向下捲動查看更多",
+        "scroll_hidden": "個未顯示",
         "lines": "行",
     ]
 
@@ -555,7 +795,7 @@ final class L10n: ObservableObject {
         "shortcut_recording": "記録中…",
         "shortcut_none": "未設定",
         "shortcut_togglePanel": "パネルを切り替え",
-        "shortcut_togglePanel_desc": "CodeIsland パネルを開閉します",
+        "shortcut_togglePanel_desc": "Notch Cove パネルを開閉します",
         "shortcut_approve": "承認",
         "shortcut_approve_desc": "現在の権限リクエストを承認します",
         "shortcut_approveAlways": "常に承認",
@@ -637,7 +877,7 @@ final class L10n: ObservableObject {
         "tool_or_api_error": "ツール失敗または API エラー",
         "system_section": "システム",
         "boot_sound": "起動音",
-        "boot_sound_desc": "CodeIsland の起動時にジングルを再生します",
+        "boot_sound_desc": "Notch Cove の起動時にジングルを再生します",
         "interaction": "操作",
         "approval_needed": "承認が必要",
         "waiting_approval_desc": "権限承認または回答を待っています",
@@ -671,7 +911,7 @@ final class L10n: ObservableObject {
         "remote_auth_socket_placeholder": "~/.1password/agent.sock",
         "remote_auto_connect": "起動時に自動接続",
         "remote_add_button": "ホストを追加",
-        "remote_hint": "ホスト欄には通常のホスト名または ~/.ssh/config のエイリアスを指定できます。CodeIsland は小さなリモート hook スクリプトをインストールし、SSH 経由でイベントを転送します。",
+        "remote_hint": "ホスト欄には通常のホスト名または ~/.ssh/config のエイリアスを指定できます。Notch Cove は小さなリモート hook スクリプトをインストールし、SSH 経由でイベントを転送します。",
         "remote_connect": "接続",
         "remote_connecting": "接続中…",
         "remote_connected": "接続済み",
@@ -684,7 +924,7 @@ final class L10n: ObservableObject {
         "about_desc2": "Unix socket IPC を通じて 11 種類の CLI/IDE ツールをサポート",
 
         // Window
-        "settings_title": "CodeIsland 設定",
+        "settings_title": "Notch Cove 設定",
 
         // Menu
         "settings_ellipsis": "設定...",
@@ -697,11 +937,11 @@ final class L10n: ObservableObject {
 
         // Update
         "update_available_title": "アップデートがあります",
-        "update_available_body": "CodeIsland %@ が利用可能です (現在: %@)。ダウンロードしますか？",
+        "update_available_body": "Notch Cove %@ が利用可能です (現在: %@)。ダウンロードしますか？",
         "download_update": "ダウンロード",
         "later": "後で",
         "no_update_title": "最新です",
-        "no_update_body": "CodeIsland %@ は最新バージョンです。",
+        "no_update_body": "Notch Cove %@ は最新バージョンです。",
         "ok": "OK",
         "update_now": "今すぐアップデート",
         "update_downloading": "アップデートをダウンロード中...",
@@ -711,8 +951,8 @@ final class L10n: ObservableObject {
         "update_installing": "アップデートをインストール中...",
         "update_retry": "再試行",
         "update_homebrew_title": "アップデートがあります",
-        "update_homebrew_body": "CodeIsland %@ が利用可能です。Homebrew でインストールしたため、次を実行してください:",
-        "update_homebrew_command": "brew upgrade codeisland",
+        "update_homebrew_body": "Notch Cove %@ が利用可能です。Homebrew でインストールしたため、次を実行してください:",
+        "update_homebrew_command": "brew upgrade notchcove",
         "update_copy_command": "コマンドをコピー",
 
         // NotchPanel
@@ -791,7 +1031,7 @@ final class L10n: ObservableObject {
         "shortcut_recording": "기록 중…",
         "shortcut_none": "설정되지 않음",
         "shortcut_togglePanel": "패널 전환",
-        "shortcut_togglePanel_desc": "CodeIsland 패널을 열거나 닫습니다",
+        "shortcut_togglePanel_desc": "Notch Cove 패널을 열거나 닫습니다",
         "shortcut_approve": "승인",
         "shortcut_approve_desc": "현재 권한 요청을 승인합니다",
         "shortcut_approveAlways": "항상 승인",
@@ -873,7 +1113,7 @@ final class L10n: ObservableObject {
         "tool_or_api_error": "도구 실패 또는 API 오류",
         "system_section": "시스템",
         "boot_sound": "시작 사운드",
-        "boot_sound_desc": "CodeIsland가 시작될 때 알림음을 재생합니다",
+        "boot_sound_desc": "Notch Cove가 시작될 때 알림음을 재생합니다",
         "interaction": "상호작용",
         "approval_needed": "승인 필요",
         "waiting_approval_desc": "권한 승인 또는 답변을 기다리는 중입니다",
@@ -907,7 +1147,7 @@ final class L10n: ObservableObject {
         "remote_auth_socket_placeholder": "~/.1password/agent.sock",
         "remote_auto_connect": "시작 시 자동 연결",
         "remote_add_button": "호스트 추가",
-        "remote_hint": "호스트 필드에는 일반 호스트명이나 ~/.ssh/config의 별칭을 사용할 수 있습니다. CodeIsland는 작은 원격 hook 스크립트를 설치하고 SSH를 통해 이벤트를 전달합니다.",
+        "remote_hint": "호스트 필드에는 일반 호스트명이나 ~/.ssh/config의 별칭을 사용할 수 있습니다. Notch Cove는 작은 원격 hook 스크립트를 설치하고 SSH를 통해 이벤트를 전달합니다.",
         "remote_connect": "연결",
         "remote_connecting": "연결 중…",
         "remote_connected": "연결됨",
@@ -920,7 +1160,7 @@ final class L10n: ObservableObject {
         "about_desc2": "Unix socket IPC를 통해 11개의 CLI/IDE 도구를 지원합니다",
 
         // Window
-        "settings_title": "CodeIsland 설정",
+        "settings_title": "Notch Cove 설정",
 
         // Menu
         "settings_ellipsis": "설정...",
@@ -933,11 +1173,11 @@ final class L10n: ObservableObject {
 
         // Update
         "update_available_title": "업데이트 가능",
-        "update_available_body": "CodeIsland %@ 버전을 사용할 수 있습니다(현재: %@). 다운로드하시겠습니까?",
+        "update_available_body": "Notch Cove %@ 버전을 사용할 수 있습니다(현재: %@). 다운로드하시겠습니까?",
         "download_update": "다운로드",
         "later": "나중에",
         "no_update_title": "최신 상태",
-        "no_update_body": "CodeIsland %@이 최신 버전입니다.",
+        "no_update_body": "Notch Cove %@이 최신 버전입니다.",
         "ok": "확인",
         "update_now": "지금 업데이트",
         "update_downloading": "업데이트 다운로드 중...",
@@ -947,8 +1187,8 @@ final class L10n: ObservableObject {
         "update_installing": "업데이트 설치 중...",
         "update_retry": "다시 시도",
         "update_homebrew_title": "업데이트 가능",
-        "update_homebrew_body": "CodeIsland %@ 버전을 사용할 수 있습니다. Homebrew로 설치했으므로 다음 명령을 실행하세요:",
-        "update_homebrew_command": "brew upgrade codeisland",
+        "update_homebrew_body": "Notch Cove %@ 버전을 사용할 수 있습니다. Homebrew로 설치했으므로 다음 명령을 실행하세요:",
+        "update_homebrew_command": "brew upgrade notchcove",
         "update_copy_command": "명령 복사",
 
         // NotchPanel
@@ -1027,7 +1267,7 @@ final class L10n: ObservableObject {
         "shortcut_recording": "Kaydediliyor…",
         "shortcut_none": "Ayarlanmamış",
         "shortcut_togglePanel": "Paneli Aç/Kapa",
-        "shortcut_togglePanel_desc": "CodeIsland panelini aç veya kapat",
+        "shortcut_togglePanel_desc": "Notch Cove panelini aç veya kapat",
         "shortcut_approve": "İzin Ver",
         "shortcut_approve_desc": "Mevcut izin isteğini onayla",
         "shortcut_approveAlways": "Her Zaman İzin Ver",
@@ -1109,7 +1349,7 @@ final class L10n: ObservableObject {
         "tool_or_api_error": "Araç veya API hatası",
         "system_section": "Sistem",
         "boot_sound": "Başlangıç Sesi",
-        "boot_sound_desc": "CodeIsland başladığında bir jingle çal",
+        "boot_sound_desc": "Notch Cove başladığında bir jingle çal",
         "interaction": "Etkileşim",
         "approval_needed": "Onay Gerekli",
         "waiting_approval_desc": "İzin onayı veya cevap bekleniyor",
@@ -1143,7 +1383,7 @@ final class L10n: ObservableObject {
         "remote_auth_socket_placeholder": "~/.1password/agent.sock",
         "remote_auto_connect": "Başlangıçta Otomatik Bağlan",
         "remote_add_button": "Host Ekle",
-        "remote_hint": "Host alanı normal bir hostname veya ~/.ssh/config dosyanızdaki takma ad olabilir. CodeIsland küçük bir uzak hook betiği yükler ve olayları SSH üzerinden iletir.",
+        "remote_hint": "Host alanı normal bir hostname veya ~/.ssh/config dosyanızdaki takma ad olabilir. Notch Cove küçük bir uzak hook betiği yükler ve olayları SSH üzerinden iletir.",
         "remote_connect": "Bağlan",
         "remote_connecting": "Bağlanıyor…",
         "remote_connected": "Bağlı",
@@ -1156,7 +1396,7 @@ final class L10n: ObservableObject {
         "about_desc2": "Unix socket IPC üzerinden 11 CLI/IDE aracını destekler",
 
         // Window
-        "settings_title": "CodeIsland Ayarları",
+        "settings_title": "Notch Cove Ayarları",
 
         // Menu
         "settings_ellipsis": "Ayarlar...",
@@ -1169,11 +1409,11 @@ final class L10n: ObservableObject {
 
         // Update
         "update_available_title": "Güncelleme Mevcut",
-        "update_available_body": "CodeIsland %@ mevcut (şimdiki: %@). İndirmek ister misiniz?",
+        "update_available_body": "Notch Cove %@ mevcut (şimdiki: %@). İndirmek ister misiniz?",
         "download_update": "İndir",
         "later": "Sonra",
         "no_update_title": "Güncel",
-        "no_update_body": "CodeIsland %@ en son sürüm.",
+        "no_update_body": "Notch Cove %@ en son sürüm.",
         "ok": "Tamam",
         "update_now": "Şimdi Güncelle",
         "update_downloading": "Güncelleme indiriliyor...",
@@ -1183,8 +1423,8 @@ final class L10n: ObservableObject {
         "update_installing": "Güncelleme yükleniyor...",
         "update_retry": "Tekrar Dene",
         "update_homebrew_title": "Güncelleme Mevcut",
-        "update_homebrew_body": "CodeIsland %@ mevcut. Homebrew ile yüklediğiniz için, lütfen şunu çalıştırın:",
-        "update_homebrew_command": "brew upgrade codeisland",
+        "update_homebrew_body": "Notch Cove %@ mevcut. Homebrew ile yüklediğiniz için, lütfen şunu çalıştırın:",
+        "update_homebrew_command": "brew upgrade notchcove",
         "update_copy_command": "Komutu Kopyala",
 
         // NotchPanel

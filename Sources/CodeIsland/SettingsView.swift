@@ -53,7 +53,7 @@ private struct SidebarGroup: Hashable {
 
 private let sidebarGroups: [SidebarGroup] = [
     SidebarGroup(title: nil, pages: [.general, .behavior, .appearance, .mascots, .sound, .shortcuts]),
-    SidebarGroup(title: "CodeIsland", pages: [.remote, .hooks, .about]),
+    SidebarGroup(title: "Notch Cove", pages: [.remote, .hooks, .about]),
 ]
 
 // MARK: - Main View
@@ -297,7 +297,8 @@ private struct GeneralPage: View {
                 Picker(l10n["language"], selection: $l10n.language) {
                     Text(l10n["system_language"]).tag("system")
                     Text("English").tag("en")
-                    Text("中文").tag("zh")
+                    Text("简体中文").tag("zh")
+                    Text("繁體中文").tag("zh-Hant")
                     Text("日本語").tag("ja")
                     Text("한국어").tag("ko")
                     Text("Türkçe").tag("tr")
@@ -1161,7 +1162,7 @@ private struct AboutPage: View {
                 AppLogoView(size: 100)
 
                 VStack(spacing: 6) {
-                    Text("CodeIsland")
+                    Text("Notch Cove")
                         .font(.system(size: 26, weight: .bold))
                     Text("Version \(AppVersion.current)")
                         .font(.system(size: 13))

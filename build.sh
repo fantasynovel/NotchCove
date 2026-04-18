@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-APP_NAME="CodeIsland"
+APP_NAME="Notch Cove"
+BINARY_NAME="CodeIsland"
 BUILD_DIR=".build/release"
 APP_BUNDLE="$BUILD_DIR/$APP_NAME.app"
 ICON_CATALOG="Assets.xcassets"
@@ -22,8 +23,8 @@ mkdir -p "$APP_BUNDLE/Contents/MacOS"
 mkdir -p "$APP_BUNDLE/Contents/Helpers"
 mkdir -p "$APP_BUNDLE/Contents/Resources"
 
-lipo -create "$ARM_DIR/$APP_NAME" "$X86_DIR/$APP_NAME" \
-     -output "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
+lipo -create "$ARM_DIR/$BINARY_NAME" "$X86_DIR/$BINARY_NAME" \
+     -output "$APP_BUNDLE/Contents/MacOS/$BINARY_NAME"
 lipo -create "$ARM_DIR/codeisland-bridge" "$X86_DIR/codeisland-bridge" \
      -output "$APP_BUNDLE/Contents/Helpers/codeisland-bridge"
 cp Info.plist "$APP_BUNDLE/Contents/Info.plist"
