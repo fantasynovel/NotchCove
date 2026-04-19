@@ -18,6 +18,7 @@ docs/superpowers/
 *.log
 *.tmp
 dev.sh
+dev.sh.md
 
 # Code agents config files
 .agents/
