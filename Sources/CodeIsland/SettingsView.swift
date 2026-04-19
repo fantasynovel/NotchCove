@@ -1198,6 +1198,25 @@ private struct SoundEventRow: View {
     }
 }
 
+#Preview("SoundEventRow") {
+    @Previewable @State var isOn = true
+    Form {
+        Section {
+            SoundEventRow(
+                title: "任務完成",
+                subtitle: "AI 完成了本輪回覆",
+                soundName: "8bit_complete",
+                isOn: $isOn
+            )
+        } header: {
+            Text("工作階段").foregroundStyle(settingsDescColor)
+        }
+    }
+    .formStyle(.grouped)
+    .font(.system(size: 14))
+    .frame(width: 520)
+}
+
 // MARK: - About Page
 
 private struct AboutPage: View {
@@ -1497,6 +1516,25 @@ private struct BehaviorToggleRow: View {
             }
         }
     }
+}
+
+#Preview("BehaviorToggleRow") {
+    @Previewable @State var isOn = true
+    Form {
+        Section {
+            BehaviorToggleRow(
+                title: "全螢幕時隱藏",
+                desc: "當任一應用程式進入全螢幕模式時自動隱藏面板",
+                isOn: $isOn,
+                animation: .hideFullscreen
+            )
+        } header: {
+            Text("顯示").foregroundStyle(settingsDescColor)
+        }
+    }
+    .formStyle(.grouped)
+    .font(.system(size: 14))
+    .frame(width: 520)
 }
 
 /// Canvas-based notch animation with smooth interpolation.
@@ -1924,4 +1962,54 @@ private struct ShortcutRow: View {
         }
         .contentShape(Rectangle())
     }
+}
+
+#Preview("ShortcutRow / idle") {
+    Form {
+        Section {
+            ShortcutRow(
+                action: .togglePanel,
+                isRecording: false,
+                onStartRecording: {},
+                onClear: {}
+            )
+        } header: {
+            Text("快捷鍵").foregroundStyle(settingsDescColor)
+        }
+    }
+    .formStyle(.grouped)
+    .font(.system(size: 14))
+    .frame(width: 560)
+}
+
+#Preview("ShortcutRow / recording") {
+    Form {
+        Section {
+            ShortcutRow(
+                action: .approve,
+                isRecording: true,
+                onStartRecording: {},
+                onClear: {}
+            )
+        } header: {
+            Text("快捷鍵").foregroundStyle(settingsDescColor)
+        }
+    }
+    .formStyle(.grouped)
+    .font(.system(size: 14))
+    .frame(width: 560)
+}
+
+#Preview("AppLogoView") {
+    // 備註:AboutLogo / NotchLogo 影像檔在 Assets.xcassets 裡,
+    // Xcode Preview 不一定讀得到(因為是 actool 外部編進 app bundle)。
+    // 若顯示空白或 SF 圖示,這是預期行為;實際 app 裡會正確顯示。
+    HStack(spacing: 40) {
+        AppLogoView(size: 100)
+        AppLogoView(size: 36, showBackground: false)
+            .padding()
+            .background(Color.black)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+    .padding(40)
 }
