@@ -15,8 +15,8 @@ enum UpdateState: Equatable {
 @MainActor
 final class UpdateChecker: ObservableObject {
     static let shared = UpdateChecker()
-    private static let log = Logger(subsystem: "com.codeisland", category: "UpdateChecker")
-    private let repo = "wxtsky/CodeIsland"
+    private static let log = Logger(subsystem: "com.notchcove", category: "UpdateChecker")
+    private let repo = "fantasynovel/NotchCove"
 
     @Published var state: UpdateState = .idle
 
@@ -94,8 +94,8 @@ final class UpdateChecker: ObservableObject {
         state = .downloading(progress: 0)
 
         let currentAppPath = Bundle.main.bundlePath
-        let dmgPath = NSTemporaryDirectory() + "CodeIsland-update.dmg"
-        let mountPoint = "/tmp/codeisland-update-mount"
+        let dmgPath = NSTemporaryDirectory() + "NotchCove-update.dmg"
+        let mountPoint = "/tmp/notchcove-update-mount"
 
         Task {
             do {
