@@ -2714,7 +2714,7 @@ private struct ChatMessageRow: View, Equatable {
     var body: some View {
         if isUser {
             HStack(alignment: .top, spacing: 4) {
-                Text("You")
+                Text(L10n.shared["chat_label_you"])
                     .font(.system(size: fontSize, weight: .medium, design: .monospaced))
                     .foregroundStyle(Color(hex: "#A7A7A7"))
                 Text(ChatMessageTextFormatter.literalText(text))
